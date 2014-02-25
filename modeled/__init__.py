@@ -24,3 +24,5 @@ from .object import *
 from .member import *
 from .property import *
 from .options import *
+
+from .cfunc import *
