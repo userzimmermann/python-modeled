@@ -1,0 +1,2 @@
+six
+moretools >= 0.1a31
