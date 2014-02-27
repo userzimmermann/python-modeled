@@ -23,7 +23,7 @@ Provides a special modeled.member class for modeled.cfunc.
 """
 from six import with_metaclass
 
-__all__ = ['ArgsDict', 'arg', 'ismodeledcfuncarg']
+__all__ = ['ArgsDict', 'arg', 'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
 from collections import OrderedDict
 from ctypes import _Pointer
@@ -65,9 +65,21 @@ DEFAULT_DTYPES = {
 
 
 class Type(member.type):
+    """Metaclass for :class:`modeled.cfunc.arg`.
+
+    - Provides modeled.cfunc.arg[<ctype>, <dtype>] initialization syntax.
+    """
     __module__ = 'modeled'
 
     def __getitem__(cls, ctype_and_dtype):
+        """Instantiate a modeled.cfunc.arg
+           with given `ctype` and optional explicit `dtype`.
+
+        - A POINTER's `dtype` maps the dereferenced type.
+        - If `dtype` is omitted,
+          it is taken from `modeled.cfunc.arg.DEFAULT_TYPES`,
+          based on `ctype._type_`.
+        """
         try:
             ctype, dtype = ctype_and_dtype
         except TypeError:
@@ -83,6 +95,8 @@ Type.__name__ = 'cfunc.arg.type'
 
 
 class arg(with_metaclass(Type, member)):
+    """Typed function arg member of a :class:`modeled.cfunc`.
+    """
     __module__ = 'modeled'
 
     def __init__(self, ctype, type_or_value, **options):
@@ -100,3 +114,18 @@ def ismodeledcfuncarg(obj):
     """Checks if `obj` is an instance of :class:`modeled.cfunc.arg`.
     """
     return isinstance(obj, arg)
+
+
+def getmodeledcfuncargs(obj):
+    """Get a list of all :class:`modeled.cfunc.arg` (name, instance) pairs
+       of a :class:`modeleled.cfunc` subclass
+       or (name, value) pairs of a :class:`modeled.cfunc` instance
+       in arg creation and inheritance order.
+    """
+    if modeled.ismodeledcfuncclass(obj):
+        return list(obj.model.args)
+    if modeled.ismodeledcfunc(obj):
+        return [(name, getattr(obj, name)) for (name, _) in obj.model.args]
+    raise TypeError(
+      "getmodeledcfuncargs() arg must be a subclass or instance"
+      " of modeled.cfunc")
