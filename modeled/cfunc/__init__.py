@@ -24,17 +24,23 @@ Provides a ctypes function wrapper based on modeled.object.
 from six import with_metaclass
 
 __all__ = [
-  'cfunc', 'ismodeledcfuncclass', 'ismodeledcfunc', 'ismodeledcfuncarg']
+  'cfunc', 'ismodeledcfuncclass', 'ismodeledcfunc',
+  # from .arg:
+  'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
 from ctypes import _SimpleCData, _Pointer, byref
 
 import modeled
 from modeled.member import MemberError
 
-from .arg import ArgsDict, arg, ismodeledcfuncarg
+from .arg import ArgsDict, arg, ismodeledcfuncarg, getmodeledcfuncargs
 
 
 class Model(modeled.object.model.type):
+    """Metaclass for :class:`modeled.cfunc.model`.
+
+    - Checks user-defined `class model` for `restype` and `cfunc` options.
+    """
     __module__ = 'modeled'
 
     def __init__(cls, modeledclass, members=None, options=None):
@@ -43,7 +49,9 @@ class Model(modeled.object.model.type):
           cls, modeledclass, members, options)
         cls.args = ArgsDict.struct(model=cls, args=(
           (name, a) for name, a in cls.members if ismodeledcfuncarg(a)))
-        if options:
+        if options: # No restype or cfunc option ==> undefined
+            # (Will be inherited from base model class
+            #  or raise AttributeError on access)
             try:
                 cls.restype = options['restype']
             except KeyError:
@@ -57,9 +65,15 @@ Model.__name__ = 'cfunc.model.type'
 
 
 class Type(modeled.object.type):
+    """Metaclass for :class:`modeled.cfunc`.
+
+    - Provies modeled.cfunc[<restype>, <cfunc>] syntax
+      for implicitly creating modeled.cfunc derived base classes
+      with .model.restype and .model.cfunc options assigned.
+    """
     __module__ = 'modeled'
 
-    model = Model
+    model = Model # Overrides modeled.object.model class
 
     arg = arg # modeled.cfunc.arg class
 
@@ -85,14 +99,20 @@ Type.__name__ = 'cfunc.type'
 
 
 class cfunc(with_metaclass(Type, modeled.object)):
+    """Base class for modeled.cfunc classes.
+
+    - Instantiating means calling the associated C function.
+    - Supports positional args as well as keyword args,
+      based on the modeled.cfunc.arg member definitions.
+    """
     def __init__(self, *args, **membervalues):
-        for arg, (name, _) in zip(args, self.model.members):
+        for arg, (name, _) in zip(args, self.model.args):
             membervalues[name] = arg
         modeled.object.__init__(self, **membervalues)
 
         cfunc = self.model.cfunc
         args = []
-        for (name, _), argtype in zip(self.model.members, cfunc.argtypes):
+        for (name, _), argtype in zip(self.model.args, cfunc.argtypes):
             try:
                 value = getattr(self, name)
             except MemberError as e:
