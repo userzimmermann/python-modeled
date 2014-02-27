@@ -21,32 +21,36 @@ Provides a ctypes function wrapper based on modeled.object.
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-__all__ = ['cfunc', 'ismodeledcfunc']
+from six import with_metaclass
 
-from six import add_metaclass, with_metaclass
+__all__ = ['cfunc', 'ismodeledcfunc', 'ismodeledcfuncarg']
 
 from ctypes import _SimpleCData, _Pointer, byref
 
 import modeled
-from .member import MemberError
+from modeled.member import MemberError
+
+from .arg import ArgsDict, arg, ismodeledcfuncarg
 
 
 class Model(modeled.object.model.type):
     __module__ = 'modeled'
 
-    def __init__(self, modeledclass, members=None, options=None):
+    def __init__(cls, modeledclass, members=None, options=None):
         options = Model.options(options)
+        modeled.object.model.type.__init__(
+          cls, modeledclass, members, options)
+        cls.args = ArgsDict.struct(model=cls, args=(
+          (name, a) for name, a in cls.members if ismodeledcfuncarg(a)))
         if options:
             try:
-                self.restype = options['restype']
+                cls.restype = options['restype']
             except KeyError:
                 pass
             try:
-                self.cfunc = options['cfunc']
+                cls.cfunc = options['cfunc']
             except KeyError:
                 pass
-        modeled.object.model.type.__init__(
-          self, modeledclass, members, options)
 
 Model.__name__ = 'cfunc.model.type'
 
@@ -55,6 +59,14 @@ class Type(modeled.object.type):
     __module__ = 'modeled'
 
     model = Model
+
+    arg = arg # modeled.cfunc.arg class
+
+    def __init__(cls, clsname, bases, clsattrs):
+        modeled.object.type.__init__(cls, clsname, bases, clsattrs)
+        if cls.model.members:
+            cls.model.cfunc.argtypes = [
+              m.ctype for (name, m) in cls.model.members]
 
     def __getitem__(cls, restype_and_cfunc):
         try:
@@ -71,34 +83,19 @@ class Type(modeled.object.type):
 Type.__name__ = 'cfunc.type'
 
 
-DEFAULT_DTYPES = {
-  'i': int,
-  'I': int,
-  'l': int,
-  'L': int,
-  'f': float,
-  'd': float,
-  ## 'P': Hex,
-  'z': bytes,
-  }
-
-
 class cfunc(with_metaclass(Type, modeled.object)):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **membervalues):
         for arg, (name, _) in zip(args, self.model.members):
-            kwargs[name] = arg
-        modeled.object.__init__(self, **kwargs)
+            membervalues[name] = arg
+        modeled.object.__init__(self, **membervalues)
 
         cfunc = self.model.cfunc
         args = []
         for (name, _), argtype in zip(self.model.members, cfunc.argtypes):
             try:
-                value = kwargs[name]
-            except KeyError:
-                try:
-                    value = getattr(self, name)
-                except MemberError:
-                    pass
+                value = getattr(self, name)
+            except MemberError as e:
+                membererror = e
             if issubclass(argtype, _Pointer):
                 try:
                     cvalue = argtype._type_(value)
@@ -106,7 +103,10 @@ class cfunc(with_metaclass(Type, modeled.object)):
                     cvalue = argtype._type_()
                 arg = byref(cvalue)
             else:
-                arg = argtype(value)
+                try:
+                    arg = argtype(value)
+                except NameError: # No value
+                    raise membererror
             args.append(arg)
         res = self.model.cfunc(*args)
         if self.model.restype:
