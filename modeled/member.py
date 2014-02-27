@@ -65,11 +65,19 @@ _memberid = 0
 
 
 class Type(type):
+    """Metaclass for :class:`member`.
+
+    - Provides modeled.member[<dtype>] initialization syntax.
+    """
     def __getitem__(cls, dtype):
+        """Instantiate a modeled.member with given `dtype`.
+        """
         return cls(dtype)
 
     @property
     def type(cls):
+        """Get a :class:`modeled.member`'s metaclass with .type.
+        """
         return type(cls)
 
 
@@ -156,14 +164,14 @@ def getmodeledmembers(obj, properties=True):
         if properties:
             return list(obj.model.members)
         return list((name, member) for name, member in obj.model.members
-                    if not ismodeledproperty(member))
+                    if not modeled.ismodeledproperty(member))
     if modeled.ismodeledobject(obj):
         if properties:
             return [(name, getattr(obj, name))
                     for (name, _) in obj.model.members]
         return [(name, getattr(obj, name))
                 for (name, member) in obj.model.members
-                if not ismodeledproperty(member)]
+                if not modeled.ismodeledproperty(member)]
     raise TypeError(
       "getmodeledmembers() arg must be a subclass or instance"
       " of modeled.object")
