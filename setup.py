@@ -12,6 +12,7 @@ REQUIRES = open('requirements.txt').read()
 setup(
   name='modeled',
   version=VERSION,
+  description="Universal data modeling.",
 
   author='Stefan Zimmermann',
   author_email='zimmermann.code@gmail.com',
@@ -21,7 +22,10 @@ setup(
 
   install_requires=REQUIRES,
 
-  packages=['modeled'],
+  packages=[
+    'modeled',
+    'modeled.cfunc',
+    ],
 
   classifiers=[
     'Development Status :: 3 - Alpha',
