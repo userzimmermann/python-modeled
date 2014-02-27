@@ -20,10 +20,33 @@
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
 __all__ = [
-  'PropertyError', 'property',
+  'PropertyError', 'PropertiesDict', 'property',
   'ismodeledproperty', 'getmodeledproperties']
 
+from collections import OrderedDict
+
+from moretools import simpledict, SimpleDictStructType
+
 from .member import member, MemberError
+
+
+class PropertiesDictStructType(SimpleDictStructType):
+    """`basestructtype` for `simpledict()`
+       to create PropertiesDict.struct class.
+    """
+    def __init__(self, model, properties):
+        def bases():
+            for cls in model.__bases__:
+                if cls is not object:
+                    yield cls.properties
+        # Delegates properties to SimpleDictType.__init__()
+        SimpleDictStructType.__init__( # First arg is struct __name__
+          self, '%s.properties' % repr(model), bases(), properties)
+
+
+PropertiesDict = simpledict(
+  'PropertiesDict', basestructtype=PropertiesDictStructType,
+  dicttype=OrderedDict)
 
 
 class PropertyError(MemberError):
@@ -82,7 +105,7 @@ class property(member):
         self.fset(obj, value)
 
     def __repr__(self):
-        return 'modeled.property(%s)' % (self.dtype.__name__)
+        return 'modeled.property[%s]' % (self.dtype.__name__)
 
 
 def ismodeledproperty(obj):

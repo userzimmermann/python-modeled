@@ -28,7 +28,7 @@ from inspect import isclass, getmembers
 import modeled
 from .options import Options
 from .member import MembersDict, getmodeledmembers
-from .property import ismodeledproperty
+from .property import PropertiesDict, ismodeledproperty
 
 
 def _options(options):
@@ -98,8 +98,8 @@ class Model(type):
             self.members = MembersDict.struct(
               model=self, members=getmodeledmembers(modeledclass))
             ## self.members = memberstype(modeledclass, getmodeledmembers(modeledclass))
-        ## self.properties = MembersDict(modeledclass,
-        ##   ((name, m) for name, m in self.members if ismodeledproperty(m)))
+        self.properties = PropertiesDict.struct(model=self, properties=(
+          (name, m) for name, m in self.members if ismodeledproperty(m)))
 
     def __repr__(self):
         return '%s.model' % self.modeledclass.__name__

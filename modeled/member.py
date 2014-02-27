@@ -19,6 +19,8 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
+from six import with_metaclass
+
 __all__ = [
   'MembersDict', 'MemberError', 'member',
   'ismodeledmember', 'getmodeledmembers']
@@ -62,7 +64,16 @@ class MemberError(AttributeError):
 _memberid = 0
 
 
-class member(object):
+class Type(type):
+    def __getitem__(cls, dtype):
+        return cls(dtype)
+
+    @property
+    def type(cls):
+        return type(cls)
+
+
+class member(with_metaclass(Type, object)):
     """Typed data member of a :class:`modeled.object`.
     """
     __module__ = 'modeled'
@@ -75,9 +86,18 @@ class member(object):
         global _memberid
         self._id = _memberid
         _memberid += 1
-        # Data type and default...
+        # Then set data type/default and options
+        member.__call__(self, type_or_value, **options)
+
+    def __call__(self, type_or_value, **options):
+        """(Re)set value type/default and `options`.
+
+        - If dtype was already set, default value will be converted.
+        """
         if isclass(type_or_value):
             self.dtype = type_or_value
+        elif self.dtype:
+            self.default = self.dtype(type_or_value)
         else:
             self.dtype = type(type_or_value)
             self.default = type_or_value
@@ -85,6 +105,7 @@ class member(object):
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
         self.options = Options.frozen(options)
+        return self
 
     def __get__(self, obj, owner=None):
         """Get the current member value stored in `obj.__dict__`.
@@ -109,19 +130,12 @@ class member(object):
         obj.__dict__[self.name] = value
 
     def __repr__(self):
+        repr_ = 'modeled.member[%s]' % self.dtype.__name__
         try:
             default = self.default
         except AttributeError:
-            # No default value ==> Only type name.
-            type_value_repr = self.dtype.__name__
-        else:
-            type_value_repr = repr(self.default)
-            if not re.match( # If repr is not already 'type(value)'...
-              r'^[^(]*%s\(' % self.dtype.__name__, type_value_repr
-              ):
-                type_value_repr = '%s(%s)' % (
-                  self.dtype.__name__, type_value_repr)
-        return 'modeled.member(%s)' % (type_value_repr)
+            return repr_
+        return repr_ + '(%s)' % repr(self.default)
 
 
 def ismodeledmember(obj):
