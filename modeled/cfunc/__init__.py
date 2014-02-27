@@ -23,7 +23,8 @@ Provides a ctypes function wrapper based on modeled.object.
 """
 from six import with_metaclass
 
-__all__ = ['cfunc', 'ismodeledcfunc', 'ismodeledcfuncarg']
+__all__ = [
+  'cfunc', 'ismodeledcfuncclass', 'ismodeledcfunc', 'ismodeledcfuncarg']
 
 from ctypes import _SimpleCData, _Pointer, byref
 
@@ -112,6 +113,15 @@ class cfunc(with_metaclass(Type, modeled.object)):
         if self.model.restype:
             return self.model.restype(res)
         return res
+
+
+def ismodeledcfuncclass(cls):
+    """Checks if `cls` is a subclass of :class:`modeled.cfunc`.
+    """
+    try:
+        return issubclass(cls, cfunc)
+    except TypeError: # No class at all
+        return False
 
 
 def ismodeledcfunc(obj):
