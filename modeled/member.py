@@ -69,6 +69,11 @@ class Type(type):
 
     - Provides modeled.member[<dtype>] initialization syntax.
     """
+    __module__ = 'modeled'
+
+    # To make the member exception class overridable in derived member types:
+    error = MemberError
+
     def __getitem__(cls, dtype):
         """Instantiate a modeled.member with given `dtype`.
         """
@@ -79,6 +84,8 @@ class Type(type):
         """Get a :class:`modeled.member`'s metaclass with .type.
         """
         return type(cls)
+
+Type.__name__ = 'member.type'
 
 
 class member(with_metaclass(Type, object)):
@@ -126,7 +133,8 @@ class member(with_metaclass(Type, object)):
             try:
                 return self.default
             except AttributeError:
-                raise MemberError("'%s' has no default value." % self.name)
+                raise type(self).error(
+                  "'%s' has no default value." % self.name)
 
     def __set__(self, obj, value):
         """Store a new member `value` (in `obj.__dict__`).
