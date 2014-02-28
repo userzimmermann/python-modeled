@@ -26,14 +26,15 @@ from six import with_metaclass
 __all__ = [
   'cfunc', 'ismodeledcfuncclass', 'ismodeledcfunc',
   # from .arg:
-  'ismodeledcfuncarg', 'getmodeledcfuncargs']
+  'CFuncArgError', 'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
 from ctypes import _SimpleCData, _Pointer, byref
 
 import modeled
 from modeled.member import MemberError
 
-from .arg import ArgsDict, arg, ismodeledcfuncarg, getmodeledcfuncargs
+from .arg import (
+  CFuncArgError, ArgsDict, arg, ismodeledcfuncarg, getmodeledcfuncargs)
 
 
 class Model(modeled.object.model.type):

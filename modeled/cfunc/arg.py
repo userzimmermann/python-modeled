@@ -23,7 +23,9 @@ Provides a special modeled.member class for modeled.cfunc.
 """
 from six import with_metaclass
 
-__all__ = ['ArgsDict', 'arg', 'ismodeledcfuncarg', 'getmodeledcfuncargs']
+__all__ = [
+  'CFuncArgError', 'ArgsDict', 'arg',
+  'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
 from collections import OrderedDict
 from ctypes import _Pointer
@@ -31,7 +33,7 @@ from ctypes import _Pointer
 from moretools import simpledict, SimpleDictStructType
 
 import modeled
-from modeled.member import member
+from modeled.member import MemberError, member
 
 
 class ArgsDictStructType(SimpleDictStructType):
@@ -50,6 +52,10 @@ class ArgsDictStructType(SimpleDictStructType):
 ArgsDict = simpledict(
   'ArgsDict', basestructtype=ArgsDictStructType,
   dicttype=OrderedDict)
+
+
+class CFuncArgError(MemberError):
+    __module__ = 'modeled'
 
 
 DEFAULT_DTYPES = {
