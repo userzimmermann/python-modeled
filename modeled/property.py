@@ -96,7 +96,7 @@ class property(member):
     def __set__(self, obj, value):
         """Pass a new property `value` to the defined setter function.
 
-        - Converts value to property data type (instantiates type with value)
+        - Converts value to property data type (instantiates type with value).
         """
         if not self.fset:
             raise PropertyError("'%s' has no setter." % self.name)

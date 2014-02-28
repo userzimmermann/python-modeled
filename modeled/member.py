@@ -100,7 +100,7 @@ class member(with_metaclass(Type, object)):
     def __call__(self, type_or_value, **options):
         """(Re)set value type/default and `options`.
 
-        - If dtype was already set, default value will be converted.
+        - If dtype was already set, given default value will be converted.
         """
         if isclass(type_or_value):
             self.dtype = type_or_value
@@ -116,7 +116,7 @@ class member(with_metaclass(Type, object)):
         return self
 
     def __get__(self, obj, owner=None):
-        """Get the current member value stored in `obj.__dict__`.
+        """Get the current member value (stored in `obj.__dict__`).
         """
         if not obj: # ==> Accessed from modeled.object class level
             return self
@@ -129,9 +129,9 @@ class member(with_metaclass(Type, object)):
                 raise MemberError("'%s' has no default value." % self.name)
 
     def __set__(self, obj, value):
-        """Store a new member `value` in `obj.__dict__`.
+        """Store a new member `value` (in `obj.__dict__`).
 
-        - Converts value to member data type (instantiates type with value)
+        - Converts value to member data type (instantiates type with value).
         """
         if type(value) is not self.dtype:
             value = self.dtype(value)
