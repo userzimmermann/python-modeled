@@ -77,6 +77,8 @@ class Type(member.type):
     """
     __module__ = 'modeled'
 
+    error = CFuncArgError
+
     def __getitem__(cls, ctype_and_dtype):
         """Instantiate a modeled.cfunc.arg
            with given `ctype` and optional explicit `dtype`.

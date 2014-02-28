@@ -116,8 +116,8 @@ class cfunc(with_metaclass(Type, modeled.object)):
         for (name, _), argtype in zip(self.model.args, cfunc.argtypes):
             try:
                 value = getattr(self, name)
-            except MemberError as e:
-                membererror = e
+            except CFuncArgError as e:
+                argexc = e
             if issubclass(argtype, _Pointer):
                 try:
                     cvalue = argtype._type_(value)
@@ -128,7 +128,7 @@ class cfunc(with_metaclass(Type, modeled.object)):
                 try:
                     arg = argtype(value)
                 except NameError: # No value
-                    raise membererror
+                    raise argexc
             args.append(arg)
         res = self.model.cfunc(*args)
         if self.model.restype:
