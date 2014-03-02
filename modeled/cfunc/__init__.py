@@ -33,36 +33,8 @@ from ctypes import _SimpleCData, _Pointer, byref
 import modeled
 from modeled.member import MemberError
 
-from .arg import (
-  CFuncArgError, ArgsDict, arg, ismodeledcfuncarg, getmodeledcfuncargs)
-
-
-class Model(modeled.object.model.type):
-    """Metaclass for :class:`modeled.cfunc.model`.
-
-    - Checks user-defined `class model` for `restype` and `cfunc` options.
-    """
-    __module__ = 'modeled'
-
-    def __init__(cls, modeledclass, members=None, options=None):
-        options = Model.options(options)
-        modeled.object.model.type.__init__(
-          cls, modeledclass, members, options)
-        cls.args = ArgsDict.struct(model=cls, args=(
-          (name, a) for name, a in cls.members if ismodeledcfuncarg(a)))
-        if options: # No restype or cfunc option ==> undefined
-            # (Will be inherited from base model class
-            #  or raise AttributeError on access)
-            try:
-                cls.restype = options['restype']
-            except KeyError:
-                pass
-            try:
-                cls.cfunc = options['cfunc']
-            except KeyError:
-                pass
-
-Model.__name__ = 'cfunc.model.type'
+from .model import Model
+from .arg import CFuncArgError, arg, ismodeledcfuncarg, getmodeledcfuncargs
 
 
 class Type(modeled.object.type):
@@ -74,7 +46,7 @@ class Type(modeled.object.type):
     """
     __module__ = 'modeled'
 
-    model = Model # Overrides modeled.object.model class
+    model = Model # Overrides modeled.object.type.model metaclass
 
     arg = arg # modeled.cfunc.arg class
 
