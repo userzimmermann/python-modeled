@@ -149,7 +149,8 @@ class member(with_metaclass(Type, object)):
         obj.__dict__[self.name] = value
 
     def __repr__(self):
-        repr_ = 'modeled.member[%s]' % self.dtype.__name__
+        cls = type(self)
+        repr_ = 'modeled.%s[%s]' % (cls.__name__, self.dtype.__name__)
         try:
             default = self.default
         except AttributeError:

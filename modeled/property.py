@@ -104,9 +104,6 @@ class property(member):
             value = self.dtype(value)
         self.fset(obj, value)
 
-    def __repr__(self):
-        return 'modeled.property[%s]' % (self.dtype.__name__)
-
 
 def ismodeledproperty(obj):
     """Checks if `obj` is an instance of :class:`modeled.property`.
