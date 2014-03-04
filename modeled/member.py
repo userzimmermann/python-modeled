@@ -111,11 +111,14 @@ class member(with_metaclass(Type, object)):
         """
         if isclass(type_or_value):
             self.dtype = type_or_value
-        elif self.dtype:
-            self.default = self.dtype(type_or_value)
         else:
-            self.dtype = type(type_or_value)
-            self.default = type_or_value
+            try:
+                dtype = self.dtype
+            except AttributeError:
+                self.dtype = type(type_or_value)
+                self.default = type_or_value
+            else:
+                self.default = dtype(type_or_value)
         # If no explicit name is given, the associated class attribute name
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
