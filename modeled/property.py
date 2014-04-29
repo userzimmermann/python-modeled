@@ -19,13 +19,15 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
+from six import with_metaclass
+
 __all__ = [
   'PropertyError', 'PropertiesDict', 'property',
   'ismodeledproperty', 'getmodeledproperties']
 
 from collections import OrderedDict
 
-from moretools import simpledict, SimpleDictStructType
+from moretools import cached, simpledict, SimpleDictStructType
 
 from .member import member, MemberError
 
@@ -53,7 +55,21 @@ class PropertyError(MemberError):
     __module__ = 'modeled'
 
 
-class property(member):
+class Type(member.type):
+    error = PropertyError
+
+    @cached
+    def __getitem__(cls, dtype):
+        class typedcls(cls):
+            def __init__(self, fget=None, fset=None, **options):
+                cls.__init__(self, fget=fget, fset=fset, **options)
+
+        return member.type.__getitem__(cls, dtype, typedcls)
+
+Type.__name__ = 'property.type'
+
+
+class property(with_metaclass(Type, member)):
     """Typed property member of a :class:`modeled.object`.
 
     - Instances can be used like Python's builtin.property,
@@ -63,8 +79,12 @@ class property(member):
     """
     __module__ = 'modeled'
 
-    def __init__(self, dtype, fget=None, fset=None, **options):
-        member.__init__(self, dtype, **options)
+    def __init__(self, dtype=None, fget=None, fset=None, **options):
+        if dtype is None:
+            assert(self.dtype)
+        else:
+            self.__class__ = type(self)[dtype]
+        member.__init__(self, **options)
         self.fget = fget
         self.fset = fset
 
