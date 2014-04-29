@@ -28,10 +28,9 @@ __all__ = [
   # from .arg:
   'CFuncArgError', 'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
-from ctypes import _SimpleCData, _Pointer, byref
+from ctypes import _Pointer, byref
 
 import modeled
-from modeled.member import MemberError
 
 from .model import Model
 from .arg import CFuncArgError, arg, ismodeledcfuncarg, getmodeledcfuncargs
