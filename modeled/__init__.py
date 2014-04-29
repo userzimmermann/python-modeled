@@ -26,3 +26,12 @@ from .property import *
 from .options import *
 
 from .cfunc import *
+
+
+mobject = object
+m = member
+mproperty = property
+
+
+mcfunc = cfunc
+mcarg = cfunc.arg
