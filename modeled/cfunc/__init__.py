@@ -102,10 +102,9 @@ class cfunc(with_metaclass(Type, modeled.object)):
                 except NameError: # No value
                     raise argexc
             args.append(arg)
-        res = self.model.cfunc(*args)
+        self.resvalue = self.model.cfunc(*args)
         if self.model.restype:
-            return self.model.restype(res)
-        return res
+            self.resvalue = self.model.restype(self.resvalue)
 
 
 def ismodeledcfuncclass(cls):
