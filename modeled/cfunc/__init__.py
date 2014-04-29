@@ -24,7 +24,7 @@ Provides a ctypes function wrapper based on modeled.object.
 from six import with_metaclass
 
 __all__ = [
-  'cfunc', 'ismodeledcfuncclass', 'ismodeledcfunc',
+  'cfunc', 'ismodeledcfuncclass', 'ismodeledcfuncresult',
   # from .arg:
   'CFuncArgError', 'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
@@ -116,7 +116,7 @@ def ismodeledcfuncclass(cls):
         return False
 
 
-def ismodeledcfunc(obj):
+def ismodeledcfuncresult(obj):
     """Checks if `obj` is an instance
        of :class:`modeled.cfunc` (or a derived class).
     """
