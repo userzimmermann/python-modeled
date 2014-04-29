@@ -29,7 +29,7 @@ import re
 from collections import OrderedDict
 from inspect import isclass
 
-from moretools import simpledict, SimpleDictStructType
+from moretools import cached, simpledict, SimpleDictStructType
 
 import modeled
 from .options import Options
@@ -67,17 +67,27 @@ _memberid = 0
 class Type(type):
     """Metaclass for :class:`member`.
 
-    - Provides modeled.member[<dtype>] initialization syntax.
+    - Provides modeled.member[<dtype>] syntax.
     """
     __module__ = 'modeled'
 
     # To make the member exception class overridable in derived member types:
     error = MemberError
 
-    def __getitem__(cls, dtype):
-        """Instantiate a modeled.member with given `dtype`.
+    @cached
+    def __getitem__(cls, dtype, typedcls=None):
+        """Derive a typed modeled.member class with given `dtype`.
+
+        - Optionally takes a predefined `typedcls`
+          from a derived metaclass.__getitem__.
         """
-        return cls(dtype)
+        if not typedcls:
+            class typedcls(cls):
+                pass
+
+        typedcls.dtype = dtype
+        typedcls.__name__ = '%s[%s]' % (cls.__name__, dtype.__name__)
+        return typedcls
 
     @property
     def type(cls):
@@ -89,41 +99,32 @@ Type.__name__ = 'member.type'
 
 
 class member(with_metaclass(Type, object)):
-    """Typed data member of a :class:`modeled.object`.
+    """Base class for typed data members of a :class:`modeled.object`.
     """
     __module__ = 'modeled'
 
-    def __init__(self, type_or_value, **options):
-        """Create a :class:`modeled.object` data member
-           with an explicit value type or a default value with implicit type.
+    def __init__(self, *default, **options):
+        """Create a typed :class:`modeled.object` data member
+           with an optional `default` value with implicit type.
         """
         # First the unique member ordering id
         global _memberid
         self._id = _memberid
         _memberid += 1
         # Then set data type/default and options
-        member.__call__(self, type_or_value, **options)
-
-    def __call__(self, type_or_value, **options):
-        """(Re)set value type/default and `options`.
-
-        - If dtype was already set, given default value will be converted.
-        """
-        if isclass(type_or_value):
-            self.dtype = type_or_value
+        try:
+            dtype = self.dtype
+        except AttributeError:
+            assert(len(default) == 1)
+            default = self.default = default[0]
+            self.__class__ = type(self)[type(default)]
         else:
-            try:
-                dtype = self.dtype
-            except AttributeError:
-                self.dtype = type(type_or_value)
-                self.default = type_or_value
-            else:
-                self.default = dtype(type_or_value)
+            if default:
+                self.default = dtype(*default)
         # If no explicit name is given, the associated class attribute name
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
         self.options = Options.frozen(options)
-        return self
 
     def __get__(self, obj, owner=None):
         """Get the current member value (stored in `obj.__dict__`).
@@ -149,13 +150,12 @@ class member(with_metaclass(Type, object)):
         obj.__dict__[self.name] = value
 
     def __repr__(self):
-        cls = type(self)
-        repr_ = 'modeled.%s[%s]' % (cls.__name__, self.dtype.__name__)
+        repr_ = 'modeled.' + type(self).__name__
         try:
             default = self.default
         except AttributeError:
-            return repr_
-        return repr_ + '(%s)' % repr(self.default)
+            return repr_ + '()'
+        return repr_ + '(%s)' % repr(default)
 
 
 def ismodeledmember(obj):
