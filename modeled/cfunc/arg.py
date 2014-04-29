@@ -30,7 +30,7 @@ __all__ = [
 from collections import OrderedDict
 from ctypes import _Pointer
 
-from moretools import simpledict, SimpleDictStructType
+from moretools import cached, simpledict, SimpleDictStructType
 
 import modeled
 from modeled.member import MemberError, member
@@ -79,6 +79,7 @@ class Type(member.type):
 
     error = CFuncArgError
 
+    @cached
     def __getitem__(cls, ctype_and_dtype):
         """Instantiate a modeled.cfunc.arg
            with given `ctype` and optional explicit `dtype`.
@@ -89,15 +90,18 @@ class Type(member.type):
           based on `ctype._type_`.
         """
         try:
-            ctype, dtype = ctype_and_dtype
+            _ctype, dtype = ctype_and_dtype
         except TypeError:
-            ctype = ctype_and_dtype
-            if issubclass(ctype, _Pointer):
-                dtype = DEFAULT_DTYPES[ctype._type_._type_]
+            _ctype = ctype_and_dtype
+            if issubclass(_ctype, _Pointer):
+                dtype = DEFAULT_DTYPES[_ctype._type_._type_]
             else:
-                dtype = DEFAULT_DTYPES[ctype._type_]
+                dtype = DEFAULT_DTYPES[_ctype._type_]
 
-        return cls(ctype, dtype)
+        class typedcls:
+            ctype = _ctype
+
+        return member.type.__getitem__(cls, dtype, typedcls)
 
 Type.__name__ = 'cfunc.arg.type'
 
@@ -107,9 +111,9 @@ class arg(with_metaclass(Type, member)):
     """
     __module__ = 'modeled'
 
-    def __init__(self, ctype, type_or_value, **options):
-        self.ctype = ctype
-        member.__init__(self, type_or_value, **options)
+    ## def __init__(self, ctype, type_or_value, **options):
+    ##     self.ctype = ctype
+    ##     member.__init__(self, type_or_value, **options)
 
     def __repr__(self):
         return 'modeled.cfunc.arg[%s, %s]' % (
