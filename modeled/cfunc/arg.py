@@ -98,7 +98,7 @@ class Type(member.type):
             else:
                 dtype = DEFAULT_DTYPES[_ctype._type_]
 
-        class typedcls:
+        class typedcls(cls):
             ctype = _ctype
 
         return member.type.__getitem__(cls, dtype, typedcls)
