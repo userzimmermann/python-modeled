@@ -1,2 +1,2 @@
 six
-moretools >= 0.1a35
+moretools >= 0.1a36
