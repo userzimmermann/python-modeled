@@ -28,7 +28,10 @@ __all__ = [
   # from .arg:
   'CFuncArgError', 'ismodeledcfuncarg', 'getmodeledcfuncargs']
 
+import ctypes
 from ctypes import _Pointer, byref
+# Get byref type with dummy expression:
+_Ref = type(byref(ctypes.c_int()))
 
 import modeled
 
@@ -104,6 +107,9 @@ class cfunc(with_metaclass(Type, modeled.object)):
         self.resvalue = self.model.cfunc(*args)
         if self.model.restype:
             self.resvalue = self.model.restype(self.resvalue)
+        for arg, (name, _) in zip(args, self.model.args):
+            if isinstance(arg, _Ref):
+                setattr(self, name, arg._obj.value)
 
 
 def ismodeledcfuncclass(cls):
