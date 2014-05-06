@@ -75,7 +75,6 @@ class Model(type):
            with optional override `members` and `options`.
         """
         self.modeledclass = modeledclass
-        print self, modeledclass, members, options
         ## try:
         ##     options = options or modeledclass.model
         ## except AttributeError: # No options.
