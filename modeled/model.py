@@ -21,11 +21,8 @@
 """
 __all__ = ['Model']
 
-from six import PY3, add_metaclass, with_metaclass
+from inspect import getmembers
 
-from inspect import isclass, getmembers
-
-import modeled
 from .options import Options
 from .member import MembersDict, getmodeledmembers
 from .property import PropertiesDict, ismodeledproperty
