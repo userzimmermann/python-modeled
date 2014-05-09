@@ -53,8 +53,7 @@ class Type(type):
 
         options = clsattrs.get('model') # The user-defined model options
         model = cls.type.model # The modeled object type's model metaclass
-        cls.model = model(
-          modeledclass=cls, members=members(), options=options)
+        cls.model = model(mclass=cls, members=members(), options=options)
 
     @property
     def type(cls):

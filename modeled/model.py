@@ -54,51 +54,51 @@ class Model(type):
             return dict(getmembers(options))
         return options
 
-    def __new__(mcs, modeledclass, members=None, options=None):
+    def __new__(mcs, mclass, members=None, options=None):
         def bases():
-            for cls in modeledclass.__bases__:
+            for cls in mclass.__bases__:
                 try:
                     yield cls.model
                 except AttributeError:
                     pass
 
         return type.__new__(
-          mcs, '%s.model' % modeledclass.__name__, tuple(bases()), {
-            '__module__': modeledclass.__module__,
+          mcs, '%s.model' % mclass.__name__, tuple(bases()), {
+            '__module__': mclass.__module__,
             })
 
-    def __init__(self, modeledclass, members=None, options=None):
-        """Create the model info for `modeledclass`
+    def __init__(self, mclass, members=None, options=None):
+        """Create the model info for modeled `mclass`
            with optional override `members` and `options`.
         """
-        self.modeledclass = modeledclass
+        self.mclass = mclass
         ## try:
-        ##     options = options or modeledclass.model
+        ##     options = options or mclass.model
         ## except AttributeError: # No options.
         options = _options(options)
         ## options = model.options(options)
         if not options:
-            self.name = modeledclass.__name__
+            self.name = mclass.__name__
             self.options = Options.struct(model=self)
         else:
             ## if not isinstance(options, dict):
             ##     options = dict(getmembers(options))
-            self.name = options.pop('name', modeledclass.__name__)
+            self.name = options.pop('name', mclass.__name__)
             self.options = Options.struct(model=self, options=options)
         if members:
             self.members = MembersDict.struct(model=self, members=(
               (m.name, m) for m in sorted(members, key=lambda m: m._id)))
-            ## self.members = memberstype(modeledclass,
+            ## self.members = memberstype(mclass,
             ##   ((m.name, m) for m in sorted(members, key=lambda m: m._id)))
         else:
             self.members = MembersDict.struct(
-              model=self, members=getmodeledmembers(modeledclass))
-            ## self.members = memberstype(modeledclass, getmodeledmembers(modeledclass))
+              model=self, members=getmodeledmembers(mclass))
+            ## self.members = memberstype(mclass, getmodeledmembers(mclass))
         self.properties = PropertiesDict.struct(model=self, properties=(
           (name, m) for name, m in self.members if ismodeledproperty(m)))
 
     def __repr__(self):
-        return '%s.model' % self.modeledclass.__name__
+        return '%s.model' % self.mclass.__name__
 
     @property
     def type(cls):

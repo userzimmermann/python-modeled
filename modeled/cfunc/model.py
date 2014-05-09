@@ -33,10 +33,9 @@ class Model(modeled.object.model.type):
     """
     __module__ = 'modeled'
 
-    def __init__(cls, modeledclass, members=None, options=None):
+    def __init__(cls, mclass, members=None, options=None):
         options = Model.options(options)
-        modeled.object.model.type.__init__(
-          cls, modeledclass, members, options)
+        modeled.object.model.type.__init__(cls, mclass, members, options)
         cls.args = ArgsDict.struct(model=cls, args=(
           (name, a) for name, a in cls.members if ismodeledcfuncarg(a)))
         if options: # No restype or cfunc option ==> undefined
