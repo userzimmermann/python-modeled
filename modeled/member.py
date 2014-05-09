@@ -35,7 +35,7 @@ import modeled
 from .options import Options
 
 
-class MembersDictStructType(SimpleDictStructType):
+class MembersDictStructBase(simpledict.structbase):
     """`basestructtype` for `simpledict()` to create MembersDict.struct class.
     """
     def __init__(self, model, members):
@@ -49,8 +49,7 @@ class MembersDictStructType(SimpleDictStructType):
 
 
 MembersDict = simpledict(
-  'MembersDict', basestructtype=MembersDictStructType,
-  dicttype=OrderedDict)
+  'MembersDict', structbase=MembersDictStructBase, dicttype=OrderedDict)
 
 
 class MemberError(AttributeError):
