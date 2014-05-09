@@ -87,19 +87,20 @@ class Type(type):
         try:
             dtype, newfunc = dtype_and_new
         except TypeError:
-            dtype = newfunc = dtype_and_new
+            dtype = new = dtype_and_new
+        else:
+            def new(self, value, func=newfunc):
+                value = func(value)
+                if isinstance(value, self.dtype):
+                    return value
+                raise TypeError(
+                  "%s.new.func() must return an instance of '%s', not '%s'"
+                  % (type(self).__name__, self.dtype.__name__,
+                     type(value).__name__))
+
+            new.func = newfunc
+
         typedcls.dtype = dtype
-
-        def new(self, value, func=newfunc):
-            value = func(value)
-            if isinstance(value, self.dtype):
-                return value
-            raise TypeError(
-              "%s.new.func() must return an instance of '%s', not '%s'" % (
-                type(self).__name__, self.dtype.__name__,
-                type(value).__name__))
-
-        new.func = newfunc
         typedcls.new = new
         typedcls.__name__ = '%s[%s]' % (cls.__name__, dtype.__name__)
         return typedcls
