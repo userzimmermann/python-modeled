@@ -74,7 +74,7 @@ class Type(type):
     error = MemberError
 
     @cached
-    def __getitem__(cls, dtype, typedcls=None):
+    def __getitem__(cls, dtype_and_new, typedcls=None):
         """Derive a typed modeled.member class with given `dtype`.
 
         - Optionally takes a predefined `typedcls`
@@ -84,7 +84,23 @@ class Type(type):
             class typedcls(cls):
                 pass
 
+        try:
+            dtype, newfunc = dtype_and_new
+        except TypeError:
+            dtype = newfunc = dtype_and_new
         typedcls.dtype = dtype
+
+        def new(self, value, func=newfunc):
+            value = func(value)
+            if isinstance(value, self.dtype):
+                return value
+            raise TypeError(
+              "%s.new.func() must return an instance of '%s', not '%s'" % (
+                type(self).__name__, self.dtype.__name__,
+                type(value).__name__))
+
+        new.func = newfunc
+        typedcls.new = new
         typedcls.__name__ = '%s[%s]' % (cls.__name__, dtype.__name__)
         return typedcls
 
@@ -144,8 +160,8 @@ class member(with_metaclass(Type, object)):
 
         - Converts value to member data type (instantiates type with value).
         """
-        if type(value) is not self.dtype:
-            value = self.dtype(value)
+        if not isinstance(value, self.dtype):
+            value = self.new(value)
         obj.__dict__[self.name] = value
 
     def __repr__(self):
