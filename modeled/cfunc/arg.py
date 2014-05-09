@@ -80,7 +80,7 @@ class Type(member.type):
     error = CFuncArgError
 
     @cached
-    def __getitem__(cls, ctype_and_dtype):
+    def __getitem__(cls, ctype_and_dtype_and_new):
         """Instantiate a modeled.cfunc.arg
            with given `ctype` and optional explicit `dtype`.
 
@@ -90,18 +90,23 @@ class Type(member.type):
           based on `ctype._type_`.
         """
         try:
-            _ctype, dtype = ctype_and_dtype
+            _ctype, dtype, new = ctype_and_dtype_and_new
+            dtype_and_new = (dtype, new)
+        except ValueError:
+            _ctype, dtype = ctype_and_dtype_and_new
+            dtype_and_new = dtype
         except TypeError:
-            _ctype = ctype_and_dtype
+            _ctype = ctype_and_dtype_and_new
             if issubclass(_ctype, _Pointer):
                 dtype = DEFAULT_DTYPES[_ctype._type_._type_]
             else:
                 dtype = DEFAULT_DTYPES[_ctype._type_]
+            dtype_and_new = dtype
 
         class typedcls(cls):
             ctype = _ctype
 
-        return member.type.__getitem__(cls, dtype, typedcls)
+        return member.type.__getitem__(cls, dtype_and_new, typedcls)
 
 Type.__name__ = 'cfunc.arg.type'
 
