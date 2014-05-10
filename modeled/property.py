@@ -30,7 +30,7 @@ from collections import OrderedDict
 from moretools import cached, simpledict, SimpleDictStructType
 
 import modeled
-from .member import member, MemberError
+from .member import member, MemberError, MembersDict
 
 
 class PropertiesDictStructBase(simpledict.structbase):
@@ -49,7 +49,7 @@ class PropertiesDictStructBase(simpledict.structbase):
 
 PropertiesDict = simpledict(
   'PropertiesDict', structbase=PropertiesDictStructBase,
-  dicttype=OrderedDict)
+    dicttype=MembersDict.dicttype)
 
 
 class PropertyError(MemberError):
