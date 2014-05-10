@@ -31,7 +31,7 @@ else:
     import __builtin__ as builtins
 
 from .model import Model
-from .member import ismodeledmember
+from .member import ismodeledmemberclass, ismodeledmember
 
 
 class Type(type):
@@ -47,7 +47,12 @@ class Type(type):
         """
         def members():
             for name, obj in clsattrs.items():
-                if ismodeledmember(obj):
+                if ismodeledmemberclass(obj):
+                    obj = obj()
+                    obj.name = name
+                    setattr(cls, name, obj)
+                    yield obj
+                elif ismodeledmember(obj):
                     if not obj.name:
                         obj.name = name
                     yield obj
