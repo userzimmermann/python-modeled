@@ -29,6 +29,7 @@ from collections import OrderedDict
 
 from moretools import cached, simpledict, SimpleDictStructType
 
+import modeled
 from .member import member, MemberError
 
 
