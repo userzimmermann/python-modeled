@@ -58,7 +58,7 @@ class CFuncArgError(MemberError):
     __module__ = 'modeled'
 
 
-DEFAULT_DTYPES = {
+DEFAULT_MTYPES = {
   'i': int,
   'I': int,
   'l': int,
@@ -73,35 +73,35 @@ DEFAULT_DTYPES = {
 class Type(member.type):
     """Metaclass for :class:`modeled.cfunc.arg`.
 
-    - Provides modeled.cfunc.arg[<ctype>, <dtype>] initialization syntax.
+    - Provides modeled.cfunc.arg[<ctype>, <mtype>] initialization syntax.
     """
     __module__ = 'modeled'
 
     error = CFuncArgError
 
     @cached
-    def __getitem__(cls, ctype_and_dtype):
+    def __getitem__(cls, ctype_and_mtype):
         """Instantiate a modeled.cfunc.arg
-           with given `ctype` and optional explicit `dtype`.
+           with given `ctype` and optional explicit `mtype`.
 
-        - A POINTER's `dtype` maps the dereferenced type.
-        - If `dtype` is omitted,
+        - A POINTER's `mtype` maps the dereferenced type.
+        - If `mtype` is omitted,
           it is taken from `modeled.cfunc.arg.DEFAULT_TYPES`,
           based on `ctype._type_`.
         """
         try:
-            _ctype, dtype = ctype_and_dtype
+            _ctype, mtype = ctype_and_mtype
         except TypeError:
-            _ctype = ctype_and_dtype
+            _ctype = ctype_and_mtype
             if issubclass(_ctype, _Pointer):
-                dtype = DEFAULT_DTYPES[_ctype._type_._type_]
+                mtype = DEFAULT_MTYPES[_ctype._type_._type_]
             else:
-                dtype = DEFAULT_DTYPES[_ctype._type_]
+                mtype = DEFAULT_MTYPES[_ctype._type_]
 
         class typedcls(cls):
             ctype = _ctype
 
-        return member.type.__getitem__(cls, dtype, typedcls)
+        return member.type.__getitem__(cls, mtype, typedcls)
 
 Type.__name__ = 'cfunc.arg.type'
 
@@ -117,7 +117,7 @@ class arg(with_metaclass(Type, member)):
 
     def __repr__(self):
         return 'modeled.cfunc.arg[%s, %s]' % (
-          self.ctype.__name__, self.dtype.__name__)
+          self.ctype.__name__, self.mtype.__name__)
 
 arg.__name__ = 'cfunc.arg'
 

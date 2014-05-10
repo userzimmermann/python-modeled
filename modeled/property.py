@@ -60,12 +60,12 @@ class Type(member.type):
     error = PropertyError
 
     @cached
-    def __getitem__(cls, dtype):
+    def __getitem__(cls, mtype):
         class typedcls(cls):
             def __init__(self, fget=None, fset=None, **options):
                 cls.__init__(self, fget=fget, fset=fset, **options)
 
-        return member.type.__getitem__(cls, dtype, typedcls)
+        return member.type.__getitem__(cls, mtype, typedcls)
 
 Type.__name__ = 'property.type'
 
@@ -80,11 +80,11 @@ class property(with_metaclass(Type, member)):
     """
     __module__ = 'modeled'
 
-    def __init__(self, dtype=None, fget=None, fset=None, **options):
-        if dtype is None:
-            assert(self.dtype)
+    def __init__(self, mtype=None, fget=None, fset=None, **options):
+        if mtype is None:
+            assert(self.mtype)
         else:
-            self.__class__ = type(self)[dtype]
+            self.__class__ = type(self)[mtype]
         member.__init__(self, **options)
         self.fget = fget
         self.fset = fset
@@ -110,8 +110,8 @@ class property(with_metaclass(Type, member)):
         if not self.fget:
             raise PropertyError("'%s' has no getter." % self.name)
         value = self.fget(obj)
-        if type(value) is not self.dtype:
-            return self.dtype(value)
+        if type(value) is not self.mtype:
+            return self.mtype(value)
         return value
 
     def __set__(self, obj, value):
@@ -121,7 +121,7 @@ class property(with_metaclass(Type, member)):
         """
         if not self.fset:
             raise PropertyError("'%s' has no setter." % self.name)
-        if not isinstance(value, self.dtype):
+        if not isinstance(value, self.mtype):
             value = self.new(value)
         self.fset(obj, value)
 

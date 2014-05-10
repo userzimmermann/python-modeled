@@ -66,7 +66,7 @@ _memberid = 0
 class Type(type):
     """Metaclass for :class:`member`.
 
-    - Provides modeled.member[<dtype>] syntax.
+    - Provides modeled.member[<mtype>] syntax.
     """
     __module__ = 'modeled'
 
@@ -74,8 +74,8 @@ class Type(type):
     error = MemberError
 
     @cached
-    def __getitem__(cls, dtype, typedcls=None):
-        """Derive a typed modeled.member class with given `dtype`.
+    def __getitem__(cls, mtype, typedcls=None):
+        """Derive a typed modeled.member class with given `mtype`.
 
         - Optionally takes a predefined `typedcls`
           from a derived metaclass.__getitem__.
@@ -84,8 +84,8 @@ class Type(type):
             class typedcls(cls):
                 pass
 
-        typedcls.dtype = dtype
-        typedcls.__name__ = '%s[%s]' % (cls.__name__, dtype.__name__)
+        typedcls.mtype = mtype
+        typedcls.__name__ = '%s[%s]' % (cls.__name__, mtype.__name__)
         return typedcls
 
     @property
@@ -104,11 +104,11 @@ class member(with_metaclass(Type, object)):
 
     def new(self, value, func):
         value = func(value)
-        if isinstance(value, self.dtype):
+        if isinstance(value, self.mtype):
             return value
         raise TypeError(
           "%s.new.func() must return an instance of '%s', not '%s'"
-          % (type(self).__name__, self.dtype.__name__,
+          % (type(self).__name__, self.mtype.__name__,
              type(value).__name__))
 
     def __init__(self, *default, **options):
@@ -121,18 +121,18 @@ class member(with_metaclass(Type, object)):
         _memberid += 1
         # Then set data type/default and options
         try:
-            dtype = self.dtype
+            mtype = self.mtype
         except AttributeError:
             assert(len(default) == 1)
             default = self.default = default[0]
             self.__class__ = type(self)[type(default)]
         else:
             if default:
-                self.default = dtype(*default)
+                self.default = mtype(*default)
         try:
             newfunc = options.pop('new')
         except KeyError:
-            self.new = self.dtype
+            self.new = self.mtype
         else:
             new = self.new
             self.new = lambda value, func=newfunc: new(value, func)
@@ -161,7 +161,7 @@ class member(with_metaclass(Type, object)):
 
         - Converts value to member data type (instantiates type with value).
         """
-        if not isinstance(value, self.dtype):
+        if not isinstance(value, self.mtype):
             value = self.new(value)
         obj.__dict__[self.name] = value
 
