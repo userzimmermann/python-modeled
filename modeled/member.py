@@ -74,7 +74,7 @@ class Type(type):
     error = MemberError
 
     @cached
-    def __getitem__(cls, dtype_and_new, typedcls=None):
+    def __getitem__(cls, dtype, typedcls=None):
         """Derive a typed modeled.member class with given `dtype`.
 
         - Optionally takes a predefined `typedcls`
@@ -84,24 +84,7 @@ class Type(type):
             class typedcls(cls):
                 pass
 
-        try:
-            dtype, newfunc = dtype_and_new
-        except TypeError:
-            dtype = new = dtype_and_new
-        else:
-            def new(self, value, func=newfunc):
-                value = func(value)
-                if isinstance(value, self.dtype):
-                    return value
-                raise TypeError(
-                  "%s.new.func() must return an instance of '%s', not '%s'"
-                  % (type(self).__name__, self.dtype.__name__,
-                     type(value).__name__))
-
-            new.func = newfunc
-
         typedcls.dtype = dtype
-        typedcls.new = new
         typedcls.__name__ = '%s[%s]' % (cls.__name__, dtype.__name__)
         return typedcls
 
@@ -118,6 +101,15 @@ class member(with_metaclass(Type, object)):
     """Base class for typed data members of a :class:`modeled.object`.
     """
     __module__ = 'modeled'
+
+    def new(self, value, func):
+        value = func(value)
+        if isinstance(value, self.dtype):
+            return value
+        raise TypeError(
+          "%s.new.func() must return an instance of '%s', not '%s'"
+          % (type(self).__name__, self.dtype.__name__,
+             type(value).__name__))
 
     def __init__(self, *default, **options):
         """Create a typed :class:`modeled.object` data member
@@ -137,6 +129,14 @@ class member(with_metaclass(Type, object)):
         else:
             if default:
                 self.default = dtype(*default)
+        try:
+            newfunc = options.pop('new')
+        except KeyError:
+            self.new = self.dtype
+        else:
+            new = self.new
+            self.new = lambda value, func=newfunc: new(value, func)
+            self.new.func = newfunc
         # If no explicit name is given, the associated class attribute name
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
