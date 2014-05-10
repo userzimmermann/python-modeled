@@ -80,11 +80,11 @@ class property(with_metaclass(Type, member)):
     """
     __module__ = 'modeled'
 
-    def __init__(self, dtype_and_new=None, fget=None, fset=None, **options):
-        if dtype_and_new is None:
+    def __init__(self, dtype=None, fget=None, fset=None, **options):
+        if dtype is None:
             assert(self.dtype)
         else:
-            self.__class__ = type(self)[dtype_and_new]
+            self.__class__ = type(self)[dtype]
         member.__init__(self, **options)
         self.fget = fget
         self.fset = fset
