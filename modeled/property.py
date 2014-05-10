@@ -49,7 +49,7 @@ class PropertiesDictStructBase(simpledict.structbase):
 
 PropertiesDict = simpledict(
   'PropertiesDict', structbase=PropertiesDictStructBase,
-    dicttype=MembersDict.dicttype)
+  dicttype=MembersDict.dicttype)
 
 
 class PropertyError(MemberError):
