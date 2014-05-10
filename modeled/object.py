@@ -48,7 +48,8 @@ class Type(type):
         def members():
             for name, obj in clsattrs.items():
                 if ismodeledmember(obj):
-                    obj.name = name
+                    if not obj.name:
+                        obj.name = name
                     yield obj
 
         options = clsattrs.get('model') # The user-defined model options
