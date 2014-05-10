@@ -33,8 +33,8 @@ import modeled
 from .member import member, MemberError
 
 
-class PropertiesDictStructType(SimpleDictStructType):
-    """`basestructtype` for `simpledict()`
+class PropertiesDictStructBase(simpledict.structbase):
+    """Custom `simpledict.structbase` type
        to create PropertiesDict.struct class.
     """
     def __init__(self, model, properties):
@@ -48,7 +48,7 @@ class PropertiesDictStructType(SimpleDictStructType):
 
 
 PropertiesDict = simpledict(
-  'PropertiesDict', basestructtype=PropertiesDictStructType,
+  'PropertiesDict', structbase=PropertiesDictStructBase,
   dicttype=OrderedDict)
 
 
