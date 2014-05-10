@@ -23,7 +23,7 @@ from six import with_metaclass
 
 __all__ = [
   'MembersDict', 'MemberError', 'member',
-  'ismodeledmember', 'getmodeledmembers']
+  'ismodeledmemberclass', 'ismodeledmember', 'getmodeledmembers']
 
 import re
 from collections import OrderedDict
@@ -172,6 +172,12 @@ class member(with_metaclass(Type, object)):
         except AttributeError:
             return repr_ + '()'
         return repr_ + '(%s)' % repr(default)
+
+
+def ismodeledmemberclass(cls):
+    """Checks if `cls` is a subclass of :class:`modeled.member`.
+    """
+    return issubclass(cls, member)
 
 
 def ismodeledmember(obj):
