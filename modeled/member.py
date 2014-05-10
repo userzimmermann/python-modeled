@@ -177,7 +177,10 @@ class member(with_metaclass(Type, object)):
 def ismodeledmemberclass(cls):
     """Checks if `cls` is a subclass of :class:`modeled.member`.
     """
-    return issubclass(cls, member)
+    try:
+        return issubclass(cls, member)
+    except TypeError: # No class at all
+        return False
 
 
 def ismodeledmember(obj):
