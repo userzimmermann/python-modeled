@@ -25,11 +25,9 @@ __all__ = [
   'MembersDict', 'MemberError', 'member',
   'ismodeledmemberclass', 'ismodeledmember', 'getmodeledmembers']
 
-import re
 from collections import OrderedDict
-from inspect import isclass
 
-from moretools import simpledict, SimpleDictStructType
+from moretools import simpledict
 
 import modeled
 from modeled.options import Options
@@ -45,7 +43,7 @@ class MembersDictStructBase(simpledict.structbase):
                 if cls is not object:
                     yield cls.members
         # Delegates members to SimpleDictType.__init__()
-        SimpleDictStructType.__init__( # First arg is struct __name__
+        simpledict.structbase.__init__( # First arg is struct __name__
           self, '%s.members' % repr(model), bases(), members)
 
 
