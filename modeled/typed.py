@@ -54,4 +54,7 @@ Type.__name__ = 'base.type'
 
 
 class base(with_metaclass(Type, base)):
+    """Base class for all :mod:`modeled` components
+       with a connected data type (mtype).
+    """
     pass
