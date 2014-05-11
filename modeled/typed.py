@@ -57,4 +57,11 @@ class base(with_metaclass(Type, base)):
     """Base class for all :mod:`modeled` components
        with a connected data type (mtype).
     """
-    pass
+    def new(self, value, func):
+        value = func(value)
+        if isinstance(value, self.mtype):
+            return value
+        raise TypeError(
+          "%s.new.func() must return an instance of '%s', not '%s'"
+          % (type(self).__name__, self.mtype.__name__,
+             type(value).__name__))

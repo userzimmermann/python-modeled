@@ -80,15 +80,6 @@ class member(with_metaclass(Type, typed.base)):
     """
     __module__ = 'modeled'
 
-    def new(self, value, func):
-        value = func(value)
-        if isinstance(value, self.mtype):
-            return value
-        raise TypeError(
-          "%s.new.func() must return an instance of '%s', not '%s'"
-          % (type(self).__name__, self.mtype.__name__,
-             type(value).__name__))
-
     def __init__(self, *default, **options):
         """Create a typed :class:`modeled.object` data member
            with an optional `default` value with implicit type.
