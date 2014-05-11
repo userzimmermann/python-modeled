@@ -33,6 +33,8 @@ from .base import base
 class Type(base.type):
     """Meta class for :class:`modeled.object`.
     """
+    __module__ = 'modeled'
+
     model = Model # The basic model info metaclass
 
     def __init__(cls, clsname, bases, clsattrs):
@@ -56,6 +58,8 @@ class Type(base.type):
         options = clsattrs.get('model') # The user-defined model options
         model = cls.type.model # The modeled object type's model metaclass
         cls.model = model(mclass=cls, members=members(), options=options)
+
+Type.__name__ = 'object.type'
 
 
 class object(with_metaclass(Type, base)):
