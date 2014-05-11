@@ -25,9 +25,7 @@ __all__ = [
   'PropertyError', 'PropertiesDict', 'property',
   'ismodeledproperty', 'getmodeledproperties']
 
-from collections import OrderedDict
-
-from moretools import cached, simpledict, SimpleDictStructType
+from moretools import cached, simpledict
 
 import modeled
 from .member import member, MemberError, MembersDict
@@ -43,7 +41,7 @@ class PropertiesDictStructBase(simpledict.structbase):
                 if cls is not object:
                     yield cls.properties
         # Delegates properties to SimpleDictType.__init__()
-        SimpleDictStructType.__init__( # First arg is struct __name__
+        simpledict.structbase.__init__( # First arg is struct __name__
           self, '%s.properties' % repr(model), bases(), properties)
 
 
