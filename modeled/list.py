@@ -19,8 +19,6 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
-
 __all__ = ['list']
 
 from six.moves import builtins
