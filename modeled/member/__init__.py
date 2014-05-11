@@ -190,3 +190,7 @@ def getmodeledmembers(obj, properties=True):
     raise TypeError(
       "getmodeledmembers() arg must be a subclass or instance"
       " of modeled.object")
+
+
+from .tuple import Tuple
+member.tuple = Tuple
