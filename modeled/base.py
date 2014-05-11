@@ -15,25 +15,30 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
 
-"""modeled
+"""modeled.base
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
+from six import with_metaclass
 
-from .base import *
-
-from .object import *
-from .member import *
-from .property import *
-from .options import *
-
-from .cfunc import *
+__all__ = ['base']
 
 
-mobject = object
-m = member
-mproperty = property
+class Type(type):
+    """Base metaclass for all :mod:`modeled` components.
+    """
+    __module__ = 'modeled'
+
+    @property
+    def type(cls):
+        """Get the metaclass of `cls` with `.type`.
+        """
+        return type(cls)
+
+Type.__name__ = 'base.type'
 
 
-mcfunc = cfunc
-mcarg = cfunc.arg
+class base(with_metaclass(Type, object)):
+    """Base class for all :mod:`modeled` components.
+    """
+    __module__ = 'modeled'
