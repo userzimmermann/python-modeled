@@ -29,10 +29,11 @@ import re
 from collections import OrderedDict
 from inspect import isclass
 
-from moretools import cached, simpledict, SimpleDictStructType
+from moretools import simpledict, SimpleDictStructType
 
 import modeled
 from .options import Options
+from . import typed
 
 
 class MembersDictStructBase(simpledict.structbase):
@@ -63,7 +64,7 @@ class MemberError(AttributeError):
 _memberid = 0
 
 
-class Type(type):
+class Type(typed.base.type):
     """Metaclass for :class:`member`.
 
     - Provides modeled.member[<mtype>] syntax.
@@ -73,31 +74,10 @@ class Type(type):
     # To make the member exception class overridable in derived member types:
     error = MemberError
 
-    @cached
-    def __getitem__(cls, mtype, typedcls=None):
-        """Derive a typed modeled.member class with given `mtype`.
-
-        - Optionally takes a predefined `typedcls`
-          from a derived metaclass.__getitem__.
-        """
-        if not typedcls:
-            class typedcls(cls):
-                pass
-
-        typedcls.mtype = mtype
-        typedcls.__name__ = '%s[%s]' % (cls.__name__, mtype.__name__)
-        return typedcls
-
-    @property
-    def type(cls):
-        """Get a :class:`modeled.member`'s metaclass with .type.
-        """
-        return type(cls)
-
 Type.__name__ = 'member.type'
 
 
-class member(with_metaclass(Type, object)):
+class member(with_metaclass(Type, typed.base)):
     """Base class for typed data members of a :class:`modeled.object`.
     """
     __module__ = 'modeled'
