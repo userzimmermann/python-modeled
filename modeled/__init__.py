@@ -25,6 +25,9 @@ from .base import *
 from .tuple import *
 mtuple = tuple
 
+from .list import *
+mlist = list
+
 from .options import *
 
 from .object import *
