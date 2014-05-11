@@ -21,20 +21,16 @@ Provides the modeled.object base class.
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
+from six import with_metaclass
+
 __all__ = ['object', 'ismodeledclass', 'ismodeledobject']
-
-from six import PY3, with_metaclass
-
-if PY3:
-    import builtins
-else:
-    import __builtin__ as builtins
 
 from .model import Model
 from .member import ismodeledmemberclass, ismodeledmember
+from .base import base
 
 
-class Type(type):
+class Type(base.type):
     """Meta class for :class:`modeled.object`.
     """
     model = Model # The basic model info metaclass
@@ -61,14 +57,8 @@ class Type(type):
         model = cls.type.model # The modeled object type's model metaclass
         cls.model = model(mclass=cls, members=members(), options=options)
 
-    @property
-    def type(cls):
-        """Get a :class:`modeled.object`'s metaclass with .type.
-        """
-        return type(cls)
 
-
-class object(with_metaclass(Type, builtins.object)):
+class object(with_metaclass(Type, base)):
     """Base class for modeled classes.
     """
     __module__ = 'modeled'
