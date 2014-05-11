@@ -15,46 +15,40 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
 
-"""modeled.list
+"""modeled.member.list
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
 from six import with_metaclass
 
-__all__ = ['list']
+from moretools import cached
 
-from six.moves import builtins
+from modeled import mlist
+from . import member
 
-from . import typed
+
+class Type(member.type):
+    @cached
+    def __getitem__(cls, mtype):
+        return member.type.__getitem__(cls, mlist[mtype])
+
+Type.__name__ = 'member.list.type'
 
 
-class list(typed.base, builtins.list):
+class List(with_metaclass(Type, member)):
     __module__ = 'modeled'
 
-    def __init__(self, iterable):
-        items = iter(iterable)
+    def __init__(self, items=None, **options):
         try:
-            self.mtype
+            assert(issubclass(self.mtype, mlist))
         except AttributeError:
-            try:
-                first = next(items)
-            except StopIteration:
-                raise TypeError
-            self.__class__ = type(self)[type(first)]
-            self.append(first)
-        self.extend(items)
+            items = mlist(items)
+            self.__class__ = type(self)[items.mtype]
+            member.__init__(self, items, **options)
+        else:
+            if items is None:
+                member.__init__(self, **options)
+            else:
+                member.__init__(self, items, **options)
 
-    def append(self, item):
-        if not isinstance(item, self.mtype):
-            item = self.mtype(item)
-        builtins.list.append(self, item)
-
-    def extend(self, iterable):
-        def items():
-            for item in iterable:
-                if not isinstance(item, self.mtype):
-                    yield self.mtype(item)
-                else:
-                    yield item
-
-        builtins.list.extend(self, items())
+List.__name__ = 'member.list'

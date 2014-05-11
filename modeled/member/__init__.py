@@ -194,3 +194,6 @@ def getmodeledmembers(obj, properties=True):
 
 from .tuple import Tuple
 member.tuple = Tuple
+
+from .list import List
+member.list = List
