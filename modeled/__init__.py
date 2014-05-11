@@ -28,6 +28,9 @@ mtuple = tuple
 from .list import *
 mlist = list
 
+from .dict import *
+mdict = dict
+
 from .options import *
 
 from .object import *
