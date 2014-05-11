@@ -25,18 +25,17 @@ from .base import *
 from .tuple import *
 mtuple = tuple
 
-from .object import *
-from .member import *
-from .property import *
 from .options import *
 
-from .cfunc import *
-
-
+from .object import *
 mobject = object
+
+from .member import *
 m = member
+
+from .property import *
 mproperty = property
 
-
+from .cfunc import *
 mcfunc = cfunc
 mcarg = cfunc.arg
