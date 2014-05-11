@@ -23,6 +23,7 @@
 from .base import *
 
 from .tuple import *
+mtuple = tuple
 
 from .object import *
 from .member import *
