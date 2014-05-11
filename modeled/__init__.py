@@ -22,6 +22,8 @@
 
 from .base import *
 
+from .tuple import *
+
 from .object import *
 from .member import *
 from .property import *
