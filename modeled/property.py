@@ -55,6 +55,8 @@ class PropertyError(MemberError):
 
 
 class Type(member.type):
+    __module__ = 'modeled'
+
     error = PropertyError
 
     @cached
