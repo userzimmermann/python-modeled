@@ -24,6 +24,7 @@ setup(
 
   packages=[
     'modeled',
+    'modeled.member',
     'modeled.cfunc',
     ],
 

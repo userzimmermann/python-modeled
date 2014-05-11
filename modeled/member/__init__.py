@@ -32,8 +32,8 @@ from inspect import isclass
 from moretools import simpledict, SimpleDictStructType
 
 import modeled
-from .options import Options
-from . import typed
+from modeled.options import Options
+from modeled import typed
 
 
 class MembersDictStructBase(simpledict.structbase):
