@@ -33,6 +33,8 @@ mdict = dict
 
 from .namedtuple import *
 
+from .simpledict import *
+
 from .options import *
 
 from .object import *
