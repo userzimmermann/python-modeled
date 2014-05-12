@@ -31,6 +31,8 @@ mlist = list
 from .dict import *
 mdict = dict
 
+from .namedtuple import *
+
 from .options import *
 
 from .object import *
