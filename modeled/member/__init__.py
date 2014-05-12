@@ -188,3 +188,6 @@ member.tuple = Tuple
 
 from .list import List
 member.list = List
+
+from .dict import Dict
+member.dict = Dict

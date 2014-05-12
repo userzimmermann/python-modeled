@@ -28,7 +28,6 @@ from six.moves import builtins
 from moretools import cached
 
 from modeled import mtuple
-from .member import member
 from . import typed
 
 
@@ -83,32 +82,3 @@ class dict(with_metaclass(Type, typed.base, builtins.dict)):
                 yield (key, value)
 
         builtins.dict.update(self, items())
-
-
-class Type(member.type):
-    @cached
-    def __getitem__(cls, mtypes):
-        return member.type.__getitem__(cls, dict[mtypes])
-
-Type.__name__ = 'member.list.type'
-
-
-class Dict(with_metaclass(Type, member)):
-    __module__ = 'modeled'
-
-    def __init__(self, items=None, **options):
-        try:
-            assert(issubclass(self.mtype, dict))
-        except AttributeError:
-            items = dict(items)
-            self.__class__ = type(self)[items.mtype.mtypes]
-            member.__init__(self, items, **options)
-        else:
-            if items is None:
-                member.__init__(self, **options)
-            else:
-                member.__init__(self, items, **options)
-
-
-Dict.__name__ = 'member.dict'
-member.type.dict = Dict
