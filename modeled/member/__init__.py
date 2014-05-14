@@ -25,6 +25,7 @@ __all__ = [
   'MembersDict', 'MemberError', 'member',
   'ismodeledmemberclass', 'ismodeledmember', 'getmodeledmembers']
 
+from six.moves import builtins
 from collections import OrderedDict
 
 from moretools import simpledict
@@ -106,6 +107,15 @@ class member(with_metaclass(Type, typed.base)):
             new = self.new
             self.new = lambda value, func=newfunc: new(value, func)
             self.new.func = newfunc
+        try:
+            changed = options.pop('changed')
+        except KeyError:
+            self.changed = []
+        else:
+            if callable(changed):
+                self.changed = [changed]
+            else:
+                self.changed = builtins.list(changed)
         # If no explicit name is given, the associated class attribute name
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
@@ -133,6 +143,8 @@ class member(with_metaclass(Type, typed.base)):
         if not isinstance(value, self.mtype):
             value = self.new(value)
         obj.__dict__[self.name] = value
+        for func in self.changed:
+            func(obj, value)
 
     def __repr__(self):
         repr_ = 'modeled.' + type(self).__name__
