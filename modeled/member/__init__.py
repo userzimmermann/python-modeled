@@ -47,6 +47,17 @@ class MembersDictStructBase(simpledict.structbase):
         simpledict.structbase.__init__( # First arg is struct __name__
           self, '%s.members' % repr(model), bases(), members)
 
+    def __call__(self, properties=True):
+        if properties:
+            return iter(self)
+
+        def members():
+            for name, member in self:
+                if not modeled.ismodeledproperty(member):
+                    yield name, member
+
+        return members()
+
 
 MembersDict = simpledict(
   'MembersDict', structbase=MembersDictStructBase, dicttype=OrderedDict)
@@ -180,8 +191,8 @@ def getmodeledmembers(obj, properties=True):
     """
     if modeled.ismodeledclass(obj):
         if properties:
-            return list(obj.model.members)
-        return list((name, member) for name, member in obj.model.members
+            return builtins.list(obj.model.members)
+        return builtins.list((name, member) for name, member in obj.model.members
                     if not modeled.ismodeledproperty(member))
     if modeled.ismodeledobject(obj):
         if properties:
