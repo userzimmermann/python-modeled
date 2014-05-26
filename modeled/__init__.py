@@ -49,3 +49,5 @@ mproperty = property
 from .cfunc import *
 mcfunc = cfunc
 mcarg = cfunc.arg
+
+from .adapter import *

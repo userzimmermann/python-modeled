@@ -1,0 +1,71 @@
+# python-modeled
+#
+# Copyright (C) 2014 Stefan Zimmermann <zimmermann.code@gmail.com>
+#
+# python-modeled is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# python-modeled is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
+
+"""modeled.adapter
+
+.. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
+"""
+from six import with_metaclass
+
+__all__ = ['Adapter']
+
+from moretools import cached
+
+from modeled import ismodeledclass, ismodeledobject, getmodeledmembers
+
+
+class Type(type):
+    __module__ = 'modeled'
+
+    @cached
+    def __getitem__(cls, mclass):
+        if not ismodeledclass(mclass):
+            raise TypeError
+
+        class Type(type(cls), type(mclass)):
+            pass
+
+        Type.__name__ = '%s[%s].type' % (cls.__name__, mclass.__name__)
+
+        class Adapter(with_metaclass(Type, cls, mclass)):
+            __new__ = object.__new__
+
+            def __init__(self, *args, **membervalues):
+                mclass.__init__(self, **membervalues)
+                self.m = self
+                cls.__init__(self, *args)
+
+        Adapter.mclass = mclass
+        Adapter.__module__ = cls.__module__
+        Adapter.__name__ = '%s[%s]' % (cls.__name__, mclass.__name__)
+        return Adapter
+
+Type.__name__ = 'Adapter.type'
+
+
+class Adapter(with_metaclass(Type, object)):
+    __module__ = 'modeled'
+
+    def __new__(cls, mobj, *args):
+        class Adapter(cls):
+            def __init__(self, mobj, *args):
+                if not ismodeledobject(mobj):
+                    raise TypeError
+                self.m = mobj
+                cls.__init__(self, *args)
+
+        return object.__new__(Adapter, mobj, *args)
