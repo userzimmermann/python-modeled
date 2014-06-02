@@ -25,10 +25,11 @@ __all__ = ['Adapter']
 
 from moretools import cached
 
-from modeled import ismodeledclass, ismodeledobject, getmodeledmembers
+from modeled import ismodeledclass, ismodeledobject
+from .base import base
 
 
-class Type(type):
+class Type(base.type):
     __module__ = 'modeled'
 
     @cached
@@ -57,7 +58,7 @@ class Type(type):
 Type.__name__ = 'Adapter.type'
 
 
-class Adapter(with_metaclass(Type, object)):
+class Adapter(with_metaclass(Type, base)):
     __module__ = 'modeled'
 
     def __new__(cls, mobj, *args):
