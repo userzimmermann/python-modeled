@@ -111,6 +111,10 @@ class member(with_metaclass(Type, typed.base)):
             if default:
                 self.default = mtype(*default)
         try:
+            options = options['options']
+        except KeyError:
+            pass
+        try:
             newfunc = options.pop('new')
         except KeyError:
             self.new = self.mtype
@@ -130,6 +134,7 @@ class member(with_metaclass(Type, typed.base)):
         # If no explicit name is given, the associated class attribute name
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
+        self.title = options.pop('title', None)
         self.options = Options.frozen(options)
 
     def __get__(self, obj, owner=None):
@@ -151,7 +156,7 @@ class member(with_metaclass(Type, typed.base)):
 
         - Converts value to member data type (instantiates type with value).
         """
-        if not isinstance(value, self.mtype):
+        if value is not None and not isinstance(value, self.mtype):
             value = self.new(value)
         obj.__dict__[self.name] = value
         for func in self.changed:
