@@ -135,6 +135,7 @@ class member(with_metaclass(Type, typed.base)):
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
         self.title = options.pop('title', None)
+        self.format = options.pop('format', None)
         self.options = Options.frozen(options)
 
     def __get__(self, obj, owner=None):
