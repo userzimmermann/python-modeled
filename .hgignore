@@ -3,3 +3,10 @@
 \.rej$
 
 \.pyc
+
+^dist/
+\.egg-info/
+
+\.diff$
+
+\.pyproj$
