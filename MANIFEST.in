@@ -1,4 +1,6 @@
 include VERSION
 include requirements.txt
 
+include README.md
+
 include tox.ini
