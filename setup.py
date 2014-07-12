@@ -1,16 +1,8 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-
-VERSION = open('VERSION').read().strip()
-
-REQUIRES = open('requirements.txt').read()
+exec(open('__init__.py'))
 
 
 setup(
-  name='modeled',
+  name=PROJECT,
   version=VERSION,
   description="Universal data modeling.",
 
@@ -22,11 +14,18 @@ setup(
 
   install_requires=REQUIRES,
 
+  package_dir={
+    'modeled.setup': '.',
+    },
   packages=[
     'modeled',
+    'modeled.setup',
     'modeled.member',
     'modeled.cfunc',
     ],
+  package_data={
+    'modeled.setup': SETUP_DATA,
+    },
 
   classifiers=[
     'Development Status :: 3 - Alpha',
