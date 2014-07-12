@@ -11,7 +11,7 @@ if 'sdist' in sys.argv:
 
 
 setup(
-  name=PROJECT,
+  name=NAME,
   version=VERSION,
   description="Universal data modeling.",
 
