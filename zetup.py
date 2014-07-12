@@ -78,18 +78,44 @@ class Requirements(str):
         return str.__new__(cls, '\n'.join(map(str, reqs)))
 
     def __init__(self, text):
-        self._list = list(parse_requirements(text))
+        """Parse a requirements `text` and store a list
+           of pkg_reqsources.Requirement instances.
+
+        - Additionally looks for "# modname" comments after requirement lines
+          (the actual root module name of the required package)
+          and stores them as .modname attrs on the Requirement instances.
+        """
+        def reqs(): # Generate the parsed requirements from text:
+            for line in text.split('\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    req, modname = line.split('#')
+                except ValueError:
+                    req = next(parse_requirements(line))
+                    req.modname = req.key
+                else:
+                    req = next(parse_requirements(req))
+                    req.modname = modname.strip()
+                yield req
+        self._list = list(reqs())
 
     def __iter__(self):
         return iter(self._list)
 
     def __getitem__(self, name):
+        """Get a requirement by its package name.
+        """
         for req in self._list:
             if name in [req.key, req.unsafe_name]:
                 return req
         raise KeyError(name)
 
     def __add__(self, text):
+        """Return a new manager instance
+           with additional requirements from `text`.
+        """
         return type(self)('%s\n%s' % (self, text))
 
     def __repr__(self):
