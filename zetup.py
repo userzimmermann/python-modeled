@@ -176,7 +176,8 @@ else:
 
         def REQUIRES(self, reqs):
             return '\n'.join(
-              "* [`%s`](https://pypi.python.org/pypi/%s)" % (
+              "* [`%s`](\n"
+              "    https://pypi.python.org/pypi/%s)" % (
                 req, req.unsafe_name)
               for req in reqs)
 
@@ -194,7 +195,8 @@ else:
               "\n\n"
               "    pip install ."
               "\n\n"
-              "Or from [PyPI](https://pypi.python.org/pypi/%s):"
+              "Or get the latest release from [PyPI](\n"
+              "  https://pypi.python.org/pypi/%s):"
               "\n\n"
               "    pip install %s"
               % tuple(2 * [PROJECT]))
