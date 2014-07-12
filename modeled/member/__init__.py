@@ -136,6 +136,8 @@ class member(with_metaclass(Type, typed.base)):
         self.name = options.pop('name', None)
         self.title = options.pop('title', None)
         self.format = options.pop('format', None)
+        choices = options.pop('choices', None)
+        self.choices = choices and builtins.list(choices)
         self.options = Options.frozen(options)
 
     def __get__(self, obj, owner=None):
@@ -159,6 +161,9 @@ class member(with_metaclass(Type, typed.base)):
         """
         if value is not None and not isinstance(value, self.mtype):
             value = self.new(value)
+        if self.choices and value not in self.choices:
+            raise type(self).error(
+              "Not a valid choice for '%s': %s" % (self.name, repr(value)))
         obj.__dict__[self.name] = value
         for func in self.changed:
             func(obj, value)
