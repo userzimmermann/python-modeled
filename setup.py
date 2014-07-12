@@ -2,7 +2,7 @@ import sys
 from subprocess import call
 
 
-exec(open('__init__.py'))
+exec(open('__init__.py').read())
 
 if 'sdist' in sys.argv:
     status = call('scons')

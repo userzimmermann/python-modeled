@@ -20,6 +20,6 @@ PROJECT = 'modeled'
 try:
     from path import path as Path
     with Path(__file__).abspath().dirname():
-        exec(open('zetup.py'))
+        exec(open('zetup.py').read())
 except (ImportError, NameError): # No path or __file__
-    exec(open('zetup.py'))
+    exec(open('zetup.py').read())
