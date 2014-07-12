@@ -20,6 +20,12 @@
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
 
+from . import setup
+
+__version__ = setup.VERSION
+__requires__ = setup.REQUIRES
+
+
 from .base import *
 
 from .tuple import *
