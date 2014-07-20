@@ -38,6 +38,16 @@ except ImportError:
     from distutils.core import setup
 
 
+# Try to get the directory of this script,
+#  to correctly access VERSION, requirements.txt, ...
+try:
+    __file__
+except: # Happens if exec()'d from SConstruct
+    ZETUP_DIR = '.'
+else:
+    ZETUP_DIR = os.path.realpath(os.path.dirname(__file__))
+
+
 class Distribution(str):
     def find(self, modpath, raise_=True):
         dist = get_distribution(self)
@@ -222,20 +232,19 @@ if any(pyversion.startswith('3') for pyversion in PYTHON):
 
 ZETUP_DATA += ['VERSION', 'requirements.txt']
 
-VERSION = Version(open('VERSION').read().strip())
+VERSION = Version(open(os.path.join(ZETUP_DIR, 'VERSION')).read().strip())
 
-REQUIRES = Requirements(open('requirements.txt').read())
+REQUIRES = Requirements(open(os.path.join(ZETUP_DIR, 'requirements.txt')).read())
 
 # Extra requirements to use with setup's extras_require=
 EXTRAS = Extras()
 _re = re.compile(r'^requirements\.(?P<name>[^\.]+)\.txt$')
-for fname in sorted(os.listdir('.')):
+for fname in sorted(os.listdir(ZETUP_DIR)):
     match = _re.match(fname)
     if match:
         ZETUP_DATA.append(fname)
 
-        EXTRAS[match.group('name')] = open(fname).read()
-
+        EXTRAS[match.group('name')] = open(os.path.join(ZETUP_DIR, fname)).read()
 
 def zetup(**setup_options):
     """Run setup() with options from zetup.cfg
