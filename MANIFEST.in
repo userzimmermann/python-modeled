@@ -1,5 +1,7 @@
 include COPYING*
 
+include zetuprc
+
 include VERSION
 include requirements.txt
 
