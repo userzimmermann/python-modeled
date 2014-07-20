@@ -20,10 +20,12 @@
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
 
-from . import setup
+from . import zetup
 
-__version__ = setup.VERSION
-__requires__ = setup.REQUIRES
+__distribution__ = zetup.DISTRIBUTION.find(__path__[0])
+__version__ = zetup.VERSION
+
+__requires__ = zetup.REQUIRES.checked
 
 
 from .base import *
