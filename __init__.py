@@ -158,6 +158,8 @@ class Requirements(str):
            with additional requirements from `text`.
         """
         return type(self)('%s\n%s' % (
+          # For simplicity:
+          #  Just create explicit modname hints for every requirement:
           '\n'.join('%s # %s' % (req, req.modname) for req in self),
           text))
 
@@ -181,7 +183,8 @@ class Extras(OrderedDict):
 config = ConfigParser()
 for fname in ['zetup.ini', 'zetup.cfg', 'zetuprc']:
     if config.read(fname):
-        print("zetup: Using config from %s" % fname)
+        ##TODO: No print after installation (under pkg/zetup/):
+        ## print("zetup: Using config from %s" % fname)
         ZETUP_DATA = [fname]
         break
 else:
