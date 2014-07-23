@@ -77,12 +77,42 @@ _memberid = 0
 class Type(typed.base.type):
     """Metaclass for :class:`member`.
 
-    - Provides modeled.member[<mtype>] syntax.
+    - Provides modeled.member[<mtype>], ...[<choices>] (==> implicit mtype)
+      and ...[<mtype>][<choices>] syntax.
+    - Stores member (sub)class specific exception class.
     """
     __module__ = 'modeled'
 
     # To make the member exception class overridable in derived member types:
     error = MemberError
+
+    def __getitem__(cls, mtype_or_choices, typedcls=None, choicecls=None):
+        """Dynamically create a derived typed member class
+           and optionally a further derived class with member value choices.
+
+        - Member value type can be implicitly determined from choices.
+        - Override __getitem__ methods in derived classes
+          can optionally provide a precreated `typedcls` or `choicecls`.
+        """
+        if type(mtype_or_choices) is builtins.tuple:
+            choices = mtype_or_choices
+            try: # Is member cls already typed?
+                cls.mtype
+            except AttributeError:
+                mtype = type(choices[0])
+                cls = typed.base.type.__getitem__(cls, mtype, typedcls)
+
+            if not choicecls:
+                class choicecls(cls):
+                    pass
+
+            choicecls.choices = choices = builtins.list(choices)
+            choicecls.__module__ = cls.__module__
+            choicecls.__name__ = '%s%s' % (cls.__name__, choices)
+            return choicecls
+
+        mtype = mtype_or_choices
+        return typed.base.type.__getitem__(cls, mtype, typedcls)
 
 Type.__name__ = 'member.type'
 
@@ -136,8 +166,11 @@ class member(with_metaclass(Type, typed.base)):
         self.name = options.pop('name', None)
         self.title = options.pop('title', None)
         self.format = options.pop('format', None)
-        choices = options.pop('choices', None)
-        self.choices = choices and builtins.list(choices)
+        try: # Were choices already defined on class level?
+            self.choices
+        except AttributeError:
+            choices = options.pop('choices', None)
+            self.choices = choices and builtins.list(choices)
         self.options = Options.frozen(options)
 
     def __get__(self, obj, owner=None):
