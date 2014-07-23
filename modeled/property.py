@@ -108,10 +108,13 @@ class property(with_metaclass(Type, member)):
         if not obj: # ==> Accessed from modeled.object class level
             return self
         if not self.fget:
-            raise PropertyError("'%s' has no getter." % self.name)
+            raise type(self).error("'%s' has no getter." % self.name)
         value = self.fget(obj)
-        if type(value) is not self.mtype:
-            return self.mtype(value)
+        if not isinstance(value, self.mtype):
+            value = self.new(value)
+        if self.choices and value not in self.choices:
+            raise type(self).error(
+              "Not a valid choice for '%s': %s" % (self.name, repr(value)))
         return value
 
     def __set__(self, obj, value):
@@ -120,9 +123,12 @@ class property(with_metaclass(Type, member)):
         - Converts value to property data type (instantiates type with value).
         """
         if not self.fset:
-            raise PropertyError("'%s' has no setter." % self.name)
+            raise type(self).error("'%s' has no setter." % self.name)
         if not isinstance(value, self.mtype):
             value = self.new(value)
+        if self.choices and value not in self.choices:
+            raise type(self).error(
+              "Not a valid choice for '%s': %s" % (self.name, repr(value)))
         self.fset(obj, value)
 
 
