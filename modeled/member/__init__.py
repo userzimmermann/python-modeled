@@ -179,8 +179,9 @@ class member(with_metaclass(Type, typed.base)):
         """
         if not obj: # ==> Accessed from modeled.object class level
             return self
+        im = obj.__dict__[self.name]
         try:
-            return obj.__dict__[self.name].value
+            return im._
         except AttributeError:
             try:
                 return self.default
@@ -198,9 +199,12 @@ class member(with_metaclass(Type, typed.base)):
         if self.choices and value not in self.choices:
             raise type(self).error(
               "Not a valid choice for '%s': %s" % (self.name, repr(value)))
-        obj.__dict__[self.name].value = value
+        im = obj.__dict__[self.name]
+        im._ = value
         for func in self.changed:
             func(obj, value)
+        for func in im.changed:
+            func(value)
 
     def __repr__(self):
         repr_ = 'modeled.' + type(self).__name__
@@ -212,8 +216,18 @@ class member(with_metaclass(Type, typed.base)):
 
 
 class instancemember(object):
-    def __init__(self, m):
+    def __init__(self, m, mobj):
         self.m = m
+        self.mobj = mobj
+        self.changed = []
+
+    @property
+    def value(self):
+        return self.m.__get__(self.mobj)
+
+    @value.setter
+    def value(self, value):
+        return self.m.__set__(self.mobj, value)
 
     def __repr__(self):
         return 'instancemember(%s)' % repr(self.m)

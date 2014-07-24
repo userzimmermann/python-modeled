@@ -28,7 +28,7 @@ class modelbase(object):
     def __init__(self, mobj):
         self.mobj = mobj
         self.members = MembersDict(
-          (name, instancemember(m)) for name, m in self.members)
+          (name, instancemember(m, mobj)) for name, m in self.members)
         mobj.__dict__.update(self.members)
 
 
