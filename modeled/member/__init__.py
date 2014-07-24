@@ -214,6 +214,15 @@ class member(with_metaclass(Type, typed.base)):
             return repr_ + '()'
         return repr_ + '(%s)' % repr(default)
 
+    def istuple(self):
+        return issubclass(self.mtype, mtuple)
+
+    def islist(self):
+        return issubclass(self.mtype, mlist)
+
+    def isdict(self):
+        return issubclass(self.mtype, mdict)
+
 
 class instancemember(object):
     def __init__(self, m, mobj):
@@ -273,11 +282,11 @@ def getmodeledmembers(obj, properties=True):
       " of modeled.object")
 
 
-from .tuple import Tuple
+from .tuple import mtuple, Tuple
 member.tuple = Tuple
 
-from .list import List
+from .list import mlist, List
 member.list = List
 
-from .dict import Dict
+from .dict import mdict, Dict
 member.dict = Dict
