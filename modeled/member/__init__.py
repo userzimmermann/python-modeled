@@ -245,15 +245,15 @@ def getmodeledmembers(obj, properties=True):
     if modeled.ismodeledclass(obj):
         if properties:
             return builtins.list(obj.model.members)
-        return builtins.list((name, member) for name, member in obj.model.members
-                    if not modeled.ismodeledproperty(member))
+        return [(name, m) for name, m in obj.model.members
+                if not modeled.ismodeledproperty(m)]
     if modeled.ismodeledobject(obj):
         if properties:
             return [(name, getattr(obj, name))
                     for (name, _) in obj.model.members]
         return [(name, getattr(obj, name))
-                for (name, member) in obj.model.members
-                if not modeled.ismodeledproperty(member.m)]
+                for (name, im) in obj.model.members
+                if not modeled.ismodeledproperty(im.m)]
     raise TypeError(
       "getmodeledmembers() arg must be a subclass or instance"
       " of modeled.object")
