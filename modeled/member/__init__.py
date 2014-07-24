@@ -32,6 +32,7 @@ from moretools import simpledict
 
 import modeled
 from modeled.options import Options
+from modeled.model import modelbase
 from modeled import typed
 
 
@@ -41,7 +42,7 @@ class MembersDictStructBase(simpledict.structbase):
     def __init__(self, model, members):
         def bases():
             for cls in model.__bases__:
-                if cls is not object:
+                if cls is not modelbase:
                     yield cls.members
         # Delegates members to SimpleDictType.__init__()
         simpledict.structbase.__init__( # First arg is struct __name__
@@ -179,8 +180,8 @@ class member(with_metaclass(Type, typed.base)):
         if not obj: # ==> Accessed from modeled.object class level
             return self
         try:
-            return obj.__dict__[self.name]
-        except KeyError:
+            return obj.__dict__[self.name].value
+        except AttributeError:
             try:
                 return self.default
             except AttributeError:
@@ -197,7 +198,7 @@ class member(with_metaclass(Type, typed.base)):
         if self.choices and value not in self.choices:
             raise type(self).error(
               "Not a valid choice for '%s': %s" % (self.name, repr(value)))
-        obj.__dict__[self.name] = value
+        obj.__dict__[self.name].value = value
         for func in self.changed:
             func(obj, value)
 
@@ -208,6 +209,14 @@ class member(with_metaclass(Type, typed.base)):
         except AttributeError:
             return repr_ + '()'
         return repr_ + '(%s)' % repr(default)
+
+
+class instancemember(object):
+    def __init__(self, m):
+        self.m = m
+
+    def __repr__(self):
+        return 'instancemember(%s)' % repr(self.m)
 
 
 def ismodeledmemberclass(cls):
@@ -244,7 +253,7 @@ def getmodeledmembers(obj, properties=True):
                     for (name, _) in obj.model.members]
         return [(name, getattr(obj, name))
                 for (name, member) in obj.model.members
-                if not modeled.ismodeledproperty(member)]
+                if not modeled.ismodeledproperty(member.m)]
     raise TypeError(
       "getmodeledmembers() arg must be a subclass or instance"
       " of modeled.object")

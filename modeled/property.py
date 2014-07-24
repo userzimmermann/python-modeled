@@ -28,6 +28,7 @@ __all__ = [
 from moretools import cached, simpledict
 
 import modeled
+from modeled.model import modelbase
 from .member import member, MemberError, MembersDict
 
 
@@ -38,7 +39,7 @@ class PropertiesDictStructBase(simpledict.structbase):
     def __init__(self, model, properties):
         def bases():
             for cls in model.__bases__:
-                if cls is not object:
+                if cls is not modelbase:
                     yield cls.properties
         # Delegates properties to SimpleDictType.__init__()
         simpledict.structbase.__init__( # First arg is struct __name__

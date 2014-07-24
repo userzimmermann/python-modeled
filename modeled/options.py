@@ -28,6 +28,9 @@ from inspect import isclass, getmembers
 
 from moretools import simpledict, SimpleDictType, SimpleDictStructType
 
+# Imported at bottom:
+# - from modeled.model import modelbase
+
 
 class OptionError(Exception):
     __module__ = 'modeled'
@@ -78,7 +81,7 @@ class OptionsStructType(SimpleDictStructType):
         """
         def bases():
             for cls in model.__bases__:
-                if cls is not object:
+                if cls is not modelbase:
                     yield cls.options
         # Delegates options to OptionsType.__init__()
         SimpleDictStructType.__init__( # First arg is struct __name__
@@ -87,3 +90,6 @@ class OptionsStructType(SimpleDictStructType):
 
 Options = simpledict(
   'Options', basetype=OptionsType, basestructtype=OptionsStructType)
+
+
+from modeled.model import modelbase

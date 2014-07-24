@@ -23,8 +23,18 @@ __all__ = ['Model']
 
 from inspect import getmembers
 
+
+class modelbase(object):
+    def __init__(self, mobj):
+        self.mobj = mobj
+        self.members = MembersDict(
+          (name, instancemember(m)) for name, m in self.members)
+        mobj.__dict__.update(self.members)
+
+
+# Import modules that need to import modelbase in reverse:
 from .options import Options
-from .member import MembersDict, getmodeledmembers
+from .member import MembersDict, instancemember, getmodeledmembers
 from .property import PropertiesDict, ismodeledproperty
 
 
@@ -63,7 +73,7 @@ class Model(type):
                     pass
 
         return type.__new__(
-          mcs, '%s.model' % mclass.__name__, tuple(bases()), {
+          mcs, '%s.model' % mclass.__name__, tuple(bases()) or (modelbase,), {
             '__module__': mclass.__module__,
             })
 
@@ -107,3 +117,5 @@ class Model(type):
         return type(cls)
 
 Model.__name__ = 'object.type.model'
+
+
