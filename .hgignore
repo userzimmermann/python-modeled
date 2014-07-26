@@ -4,6 +4,10 @@
 
 \.pyc
 
+^\.ipynb
+^\.scon[sf]
+^doc/
+
 ^dist/
 \.egg-info/
 
