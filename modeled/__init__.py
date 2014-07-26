@@ -23,8 +23,9 @@
 from . import zetup
 
 __distribution__ = zetup.DISTRIBUTION.find(__path__[0])
-__version__ = zetup.VERSION
+__description__ = zetup.DESCRIPTION
 
+__version__ = zetup.VERSION
 __requires__ = zetup.REQUIRES.checked
 
 
