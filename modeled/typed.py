@@ -34,6 +34,20 @@ class Type(base.type):
 
     - Provides class[<mtype>] syntax.
     """
+    @property
+    @cached
+    def strict(cls):
+        """Create a derived base class with strict type checking
+           (no type conversions, just raise TypeError).
+        """
+        class strict(cls):
+            __module__ = 'modeled'
+
+            strict = True
+
+        strict.__name__ = cls.__name__ + '.strict'
+        return strict
+
     @cached
     def __getitem__(cls, mtype, typedcls=None):
         """Derive a typed subclass from `cls` with given `mtype`.
