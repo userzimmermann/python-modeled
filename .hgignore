@@ -8,6 +8,8 @@
 ^\.scon[sf]
 ^doc/
 
+^\.tox/
+
 ^dist/
 \.egg-info/
 
