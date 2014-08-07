@@ -131,6 +131,10 @@ class member(with_metaclass(Type, typed.base)):
         global _memberid
         self._id = _memberid
         _memberid += 1
+        try:
+            self.strict
+        except AttributeError:
+            self.strict = bool(options.pop('strict', False))
         # Then set data type/default and options
         try:
             mtype = self.mtype
@@ -179,8 +183,9 @@ class member(with_metaclass(Type, typed.base)):
         """
         if not obj: # ==> Accessed from modeled.object class level
             return self
+        # Get the instancemember for the given object...
         im = obj.__dict__[self.name]
-        try:
+        try: #... which acts as value storage:
             return im._
         except AttributeError:
             try:
@@ -192,17 +197,25 @@ class member(with_metaclass(Type, typed.base)):
     def __set__(self, obj, value):
         """Store a new member `value` (in `obj.__dict__`).
 
-        - Converts value to member data type (instantiates type with value).
+        - If not strict, converts value to member data type
+          (instantiates type with value).
+        - Calls `changed` hook functions.
         """
         if value is not None and not isinstance(value, self.mtype):
+            if self.strict:
+                raise TypeError("%s got a %s value." % (
+                  repr(self), type(value)))
             value = self.new(value)
         if self.choices and value not in self.choices:
             raise type(self).error(
               "Not a valid choice for '%s': %s" % (self.name, repr(value)))
+        # Get the instancemember for the given object...
         im = obj.__dict__[self.name]
-        im._ = value
+        im._ = value #... which also acts as value storage
+        # Finally call hook functions... first own (modeled class level)...
         for func in self.changed:
             func(obj, value)
+        #... then instancemember level:
         for func in im.changed:
             func(value)
 
