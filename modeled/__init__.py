@@ -40,6 +40,9 @@ mlist = list
 from .dict import *
 mdict = dict
 
+from .range import *
+mrange = range
+
 from .namedtuple import *
 
 from .simpledict import *
