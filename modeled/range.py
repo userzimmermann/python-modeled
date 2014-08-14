@@ -27,6 +27,7 @@ from operator import lt, le
 
 from moretools import cached
 
+from modeled import mtuple
 from . import typed
 
 
@@ -37,10 +38,20 @@ class Type(typed.base.type):
 
     @cached
     def __getitem__(cls, mtype):
-        typedcls = typed.base.type.__getitem__(cls, mtype)
-        typedcls.inc = staticmethod(
-          cls.INC_FUNCTIONS.get(mtype, mtype.__add__))
-        return typedcls
+        class typedcls(cls):
+            pass
+
+        if type(mtype) is tuple:
+            mtype = mtuple[mtype]
+            incfuncs = tuple(
+                cls.INC_FUNCTIONS.get(mt, mt.__add__)
+                for mt in mtype.mtypes)
+            typedcls.inc = staticmethod(lambda value, step: tuple(
+              f(v, s) for f, v, s in zip(incfuncs, value, step)))
+        else:
+            typedcls.inc = staticmethod(
+                cls.INC_FUNCTIONS.get(mtype, mtype.__add__))
+        return typed.base.type.__getitem__(cls, mtype, typedcls=typedcls)
 
     def inclusive(cls, start, stop, step=1):
         return cls(start, stop, step, inclusive=True)
@@ -53,7 +64,10 @@ class range(with_metaclass(Type, typed.base)):
         try:
             mtype = self.mtype
         except AttributeError:
-            self.__class__ = type(self)[type(start)]
+            if type(start) is tuple:
+                self.__class__ = type(self)[tuple(map(type, start))]
+            else:
+                self.__class__ = type(self)[type(start)]
         else:
             if not isinstance(start, mtype):
                 start = mtype(start)
