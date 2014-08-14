@@ -47,7 +47,7 @@ class Type(base.type):
 
             def __init__(self, *args, **membervalues):
                 mclass.__init__(self, **membervalues)
-                self.m = self
+                self.minstance = self
                 cls.__init__(self, *args)
 
         Adapter.mclass = mclass
@@ -61,12 +61,13 @@ Type.__name__ = 'Adapter.type'
 class Adapter(with_metaclass(Type, base)):
     __module__ = 'modeled'
 
-    def __new__(cls, mobj, *args):
+    def __new__(cls, minstance, *args):
         class Adapter(cls):
-            def __init__(self, mobj, *args):
-                if not ismodeledobject(mobj):
+            def __init__(self, minstance, *args):
+                if not ismodeledobject(minstance):
                     raise TypeError
-                self.m = mobj
+                self.minstance = minstance
+                self.model = minstance.model
                 cls.__init__(self, *args)
 
-        return object.__new__(Adapter, mobj, *args)
+        return object.__new__(Adapter, minstance, *args)
