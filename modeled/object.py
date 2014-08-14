@@ -72,6 +72,10 @@ class object(with_metaclass(Type, base)):
         for name, value in membervalues.items():
             setattr(self, name, value)
 
+    @property
+    def m(self):
+        return self.model.members
+
 
 def ismodeledclass(cls):
     """Checks if `cls` is a subclass of :class:`modeled.object`.
