@@ -74,6 +74,8 @@ class object(with_metaclass(Type, base)):
 
     @property
     def m(self):
+        """Access instancemember objects via self.m.<member>
+        """
         return self.model.members
 
 
