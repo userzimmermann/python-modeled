@@ -15,53 +15,19 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
 
-"""modeled
+"""modeled.meta
+
+Define metaclass features on modeled class definition level.
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-
-from . import zetup
-
-__distribution__ = zetup.DISTRIBUTION.find(__path__[0])
-__description__ = zetup.DESCRIPTION
-
-__version__ = zetup.VERSION
-__requires__ = zetup.REQUIRES.checked
+__all__ = ['metamethod', 'ismetamethod']
 
 
-from .base import *
+class metamethod(object):
+    def __init__(self, func):
+        self.func = func
 
-from .tuple import *
-mtuple = tuple
 
-from .list import *
-mlist = list
-
-from .dict import *
-mdict = dict
-
-from .range import *
-mrange = range
-
-from .namedtuple import *
-
-from .simpledict import *
-
-from .options import *
-
-from .meta import *
-
-from .object import *
-mobject = object
-
-from .member import *
-m = member
-
-from .property import *
-mproperty = property
-
-from .cfunc import *
-mcfunc = cfunc
-mcarg = cfunc.arg
-
-from .adapter import *
+def ismetamethod(obj):
+    return isinstance(obj, metamethod)

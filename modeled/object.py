@@ -27,6 +27,7 @@ __all__ = ['object', 'ismodeledclass', 'ismodeledobject']
 
 from .model import Model
 from .member import ismodeledmemberclass, ismodeledmember
+from .meta import ismetamethod
 from .base import base
 
 
@@ -36,6 +37,15 @@ class Type(base.type):
     __module__ = 'modeled'
 
     model = Model # The basic model info metaclass
+
+    def __new__(mcs, clsname, bases, clsattrs):
+        metaattrs = {}
+        for name, obj in list(clsattrs.items()):
+            if ismetamethod(obj):
+                metaattrs[name] = clsattrs.pop(name).func
+        if metaattrs: # Implicitly derive a new metaclass:
+            mcs = type(clsname + '.type', (mcs,), metaattrs)
+        return base.type.__new__(mcs, clsname, bases, clsattrs)
 
     def __init__(cls, clsname, bases, clsattrs):
         """Finish a :class:`modeled.object`-derived `cls`.
