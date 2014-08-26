@@ -244,6 +244,14 @@ class instancemember(object):
         self.changed = []
 
     @property
+    def name(self):
+        return self.m.name
+
+    @property
+    def title(self):
+        return self.m.title
+
+    @property
     def value(self):
         return self.m.__get__(self.mobj)
 
