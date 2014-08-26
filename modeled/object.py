@@ -71,6 +71,24 @@ class Type(base.type):
         model = cls.type.model # The modeled object type's model metaclass
         cls.model = model(mclass=cls, members=members(), options=options)
 
+    @classmethod
+    def metamethod(mcs, func):
+        setattr(mcs, func.__name__, func)
+        return func
+
+    @classmethod
+    def metaclassmethod(mcs, func):
+        setattr(mcs, func.__name__, classmethod(func))
+        return func
+
+    def method(cls, func):
+        setattr(cls, func.__name__, func)
+        return func
+
+    def classmethod(cls, func):
+        setattr(cls, func.__name__, classmethod(func))
+        return func
+
 Type.__name__ = 'object.type'
 
 
