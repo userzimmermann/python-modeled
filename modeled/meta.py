@@ -21,7 +21,10 @@ Define metaclass features on modeled class definition level.
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-__all__ = ['metamethod', 'ismetamethod']
+__all__ = [
+  'metamethod', 'ismetamethod',
+  'metaclassmethod', 'ismetaclassmethod',
+  ]
 
 
 class metamethod(object):
@@ -29,5 +32,14 @@ class metamethod(object):
         self.func = func
 
 
+class metaclassmethod(object):
+    def __init__(self, func):
+        self.func = func
+
+
 def ismetamethod(obj):
     return isinstance(obj, metamethod)
+
+
+def ismetaclassmethod(obj):
+    return isinstance(obj, metaclassmethod)
