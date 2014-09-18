@@ -10,6 +10,11 @@ license = LGPLv3
 
 python = 2.7 3.3 3.4
 
+packages =
+    modeled
+
+zetup_config_package =
+
 classifiers =
     Development Status :: 3 - Alpha
     Intended Audience :: Developers
