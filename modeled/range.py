@@ -56,6 +56,8 @@ class Type(typed.base.type):
     def inclusive(cls, start, stop, step=1):
         return cls(start, stop, step, inclusive=True)
 
+    inc = inclusive
+
 
 class range(with_metaclass(Type, typed.base)):
     __module__ = 'modeled'
