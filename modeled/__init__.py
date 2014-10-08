@@ -32,6 +32,16 @@ __version__ = zfg.VERSION
 __requires__ = zfg.REQUIRES.checked
 
 
+import sys
+
+from path import path as Path
+
+
+for path in (Path(p) / 'modeled' for p in sys.path):
+    if path.isdir():
+        __path__.append(path)
+
+
 from .base import *
 
 from .tuple import *
