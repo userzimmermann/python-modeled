@@ -61,10 +61,11 @@ class Type(member.type):
     error = PropertyError
 
     @cached
-    def __getitem__(cls, mtype):
-        class typedcls(cls):
-            def __init__(self, fget=None, fset=None, **options):
-                cls.__init__(self, fget=fget, fset=fset, **options)
+    def __getitem__(cls, mtype, typedcls=None):
+        if not typedcls:
+            class typedcls(cls):
+                def __init__(self, fget=None, fset=None, **options):
+                    cls.__init__(self, fget=fget, fset=fset, **options)
 
         return member.type.__getitem__(cls, mtype, typedcls)
 
