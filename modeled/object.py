@@ -98,7 +98,7 @@ class object(with_metaclass(Type, base)):
     __module__ = 'modeled'
 
     def __init__(self, **membervalues):
-        self.model = self.model(mobj=self)
+        self.model = self.model(minstance=self)
         for name, value in membervalues.items():
             setattr(self, name, value)
 

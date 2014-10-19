@@ -238,9 +238,9 @@ class member(with_metaclass(Type, typed.base)):
 
 
 class instancemember(object):
-    def __init__(self, m, mobj):
+    def __init__(self, m, minstance):
         self.m = m
-        self.mobj = mobj
+        self.minstance = minstance
         self.changed = []
 
     @property
@@ -253,11 +253,11 @@ class instancemember(object):
 
     @property
     def value(self):
-        return self.m.__get__(self.mobj)
+        return self.m.__get__(self.minstance)
 
     @value.setter
     def value(self, value):
-        return self.m.__set__(self.mobj, value)
+        return self.m.__set__(self.minstance, value)
 
     def __repr__(self):
         return 'instancemember(%s)' % repr(self.m)
