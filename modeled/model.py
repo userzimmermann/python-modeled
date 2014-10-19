@@ -27,14 +27,15 @@ from inspect import getmembers
 class modelbase(object):
     def __init__(self, minstance):
         self.minstance = minstance
-        self.members = MembersDict(
+        self.members = InstanceMembersDict(
           (name, instancemember(m, minstance)) for name, m in self.members)
         minstance.__dict__.update(self.members)
 
 
 # Import modules that need to import modelbase in reverse:
 from .options import Options
-from .member import MembersDict, instancemember, getmodeledmembers
+from .member import (
+  MembersDict, InstanceMembersDict, instancemember, getmodeledmembers)
 from .property import PropertiesDict, ismodeledproperty
 
 
