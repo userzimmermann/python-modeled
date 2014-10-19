@@ -42,7 +42,7 @@ class Type(typed.base.type):
         typedcls.mtypes = mtypes = builtins.tuple(mtypes)
         typedcls.__module__ = cls.__module__
         typedcls.__name__ = '%s[%s]' % (
-          cls.__name__, ', '.join(t.__name__ for t in mtypes))
+          cls.__name__, ', '.join(t.__name__ for t in typedcls.mtypes))
         return typedcls
 
 Type.__name__ = 'tuple.type'
