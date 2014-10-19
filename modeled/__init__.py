@@ -39,7 +39,7 @@ from path import path as Path
 
 for path in (Path(p) / 'modeled' for p in sys.path):
     if path.isdir():
-        __path__.append(path)
+        __path__.append(path.realpath())
 
 
 from .base import *
