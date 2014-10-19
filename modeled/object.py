@@ -45,8 +45,14 @@ class Type(base.type):
                 metaattrs[name] = clsattrs.pop(name).func
             elif ismetaclassmethod(obj):
                 metaattrs[name] = classmethod(clsattrs.pop(name).func)
+        try:
+            meta = clsattrs.pop('meta')
+        except KeyError:
+            metabases = (mcs,)
+        else:
+            metabases = (meta, mcs)
         if metaattrs: # Implicitly derive a new metaclass:
-            mcs = type(clsname + '.type', (mcs,), metaattrs)
+            mcs = type(clsname + '.type', metabases, metaattrs)
         return base.type.__new__(mcs, clsname, bases, clsattrs)
 
     def __init__(cls, clsname, bases, clsattrs):
