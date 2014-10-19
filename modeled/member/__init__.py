@@ -23,6 +23,7 @@ from six import with_metaclass
 
 __all__ = [
   'MembersDict', 'MemberError', 'member',
+  'InstanceMembersDict', 'instancemember',
   'ismodeledmemberclass', 'ismodeledmember', 'getmodeledmembers']
 
 from six.moves import builtins
@@ -34,6 +35,8 @@ import modeled
 from modeled.options import Options
 from modeled.model import modelbase
 from modeled import typed
+
+from .context import context
 
 
 class MembersDictStructBase(simpledict.structbase):
@@ -235,6 +238,15 @@ class member(with_metaclass(Type, typed.base)):
 
     def isdict(self):
         return issubclass(self.mtype, mdict)
+
+
+class InstanceMembersDictBase(simpledict.base):
+    def __call__(self, mapping=None, **membervalues):
+        return context(self, mapping, **membervalues)
+
+
+InstanceMembersDict = simpledict('InstanceMembersDict',
+  base=InstanceMembersDictBase, dicttype=OrderedDict)
 
 
 class instancemember(object):
