@@ -29,7 +29,7 @@ __all__ = [
 from six.moves import builtins
 from collections import OrderedDict
 
-from moretools import simpledict
+from moretools import cached, simpledict
 
 import modeled
 from modeled.options import Options
@@ -270,6 +270,10 @@ class instancemember(object):
     @value.setter
     def value(self, value):
         return self.m.__set__(self.minstance, value)
+
+    @cached
+    def __getitem__(self, key):
+        return type(self)(self.m[key], self.minstance)
 
     def __repr__(self):
         return 'instancemember(%s)' % repr(self.m)
