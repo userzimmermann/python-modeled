@@ -46,6 +46,8 @@ from .base import *
 
 from .tuple import *
 mtuple = tuple
+ismtupleclass = ismodeledtupleclass
+ismtuple = ismodeledtuple
 
 from .list import *
 mlist = list

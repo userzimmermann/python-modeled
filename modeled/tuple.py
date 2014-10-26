@@ -21,7 +21,7 @@
 """
 from six import with_metaclass
 
-__all__ = ['tuple']
+__all__ = ['tuple', 'ismodeledtupleclass', 'ismodeledtuple']
 
 from six.moves import builtins
 
@@ -62,3 +62,19 @@ class tuple(with_metaclass(Type, typed.base, builtins.tuple)):
         assert(len(cls.mtypes) == len(items))
         items = (mtype(item) for mtype, item in zip(cls.mtypes, items))
         return builtins.tuple.__new__(cls, items)
+
+
+def ismodeledtupleclass(cls):
+    """Checks if `cls` is a subclass of :class:`modeled.tuple`.
+    """
+    try:
+        return issubclass(cls, tuple)
+    except TypeError: # No class at all
+        return False
+
+
+def ismodeledtuple(obj):
+    """Checks if `obj` is an instance
+       of :class:`modeled.tuple` (or a derived class).
+    """
+    return isinstance(obj, tuple)
