@@ -25,6 +25,8 @@ __all__ = [
   'PropertyError', 'PropertiesDict', 'property',
   'ismodeledproperty', 'getmodeledproperties']
 
+from six.moves import builtins
+
 from moretools import cached, simpledict
 
 import modeled
@@ -147,10 +149,14 @@ def getmodeledproperties(obj):
        in property creation and inheritance order.
     """
     if modeled.ismodeledclass(obj):
-        return list(obj.model.properties)
+        return builtins.list(obj.model.properties)
     if modeled.ismodeledobject(obj):
         return [(name, getattr(obj, name))
                 for (name, _) in obj.model.properties]
     raise TypeError(
       "getmodeledproperties() arg must be a subclass or instance"
       " of modeled.object")
+
+
+from .list import List
+property.list = List
