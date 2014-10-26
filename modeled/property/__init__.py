@@ -29,7 +29,7 @@ from moretools import cached, simpledict
 
 import modeled
 from modeled.model import modelbase
-from .member import member, MemberError, MembersDict
+from modeled.member import member, MemberError, MembersDict
 
 
 class PropertiesDictStructBase(simpledict.structbase):
