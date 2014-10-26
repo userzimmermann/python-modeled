@@ -54,6 +54,8 @@ ismlist = ismodeledlist
 
 from .dict import *
 mdict = dict
+ismdictclass = ismodeleddictclass
+ismdict = ismodeleddict
 
 from .range import *
 mrange = range

@@ -21,7 +21,7 @@
 """
 from six import with_metaclass
 
-__all__ = ['dict']
+__all__ = ['dict', 'ismodeleddictclass', 'ismodeleddict']
 
 from six.moves import builtins
 
@@ -82,3 +82,19 @@ class dict(with_metaclass(Type, typed.base, builtins.dict)):
                 yield (key, value)
 
         builtins.dict.update(self, items())
+
+
+def ismodeleddictclass(cls):
+    """Checks if `cls` is a subclass of :class:`modeled.dict`.
+    """
+    try:
+        return issubclass(cls, dict)
+    except TypeError: # No class at all
+        return False
+
+
+def ismodeleddict(obj):
+    """Checks if `obj` is an instance
+       of :class:`modeled.dict` (or a derived class).
+    """
+    return isinstance(obj, dict)
