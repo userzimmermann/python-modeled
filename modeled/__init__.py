@@ -49,6 +49,8 @@ mtuple = tuple
 
 from .list import *
 mlist = list
+ismlistclass = ismodeledlistclass
+ismlist = ismodeledlist
 
 from .dict import *
 mdict = dict

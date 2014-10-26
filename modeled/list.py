@@ -19,7 +19,7 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-__all__ = ['list']
+__all__ = ['list', 'ismodeledlistclass', 'ismodeledlist']
 
 from six.moves import builtins
 
@@ -56,3 +56,19 @@ class list(typed.base, builtins.list):
                     yield item
 
         builtins.list.extend(self, items())
+
+
+def ismodeledlistclass(cls):
+    """Checks if `cls` is a subclass of :class:`modeled.list`.
+    """
+    try:
+        return issubclass(cls, list)
+    except TypeError: # No class at all
+        return False
+
+
+def ismodeledlist(obj):
+    """Checks if `obj` is an instance
+       of :class:`modeled.list` (or a derived class).
+    """
+    return isinstance(obj, list)
