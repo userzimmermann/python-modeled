@@ -51,8 +51,8 @@ class Type(base.type):
             metabases = (mcs,)
         else:
             metabases = (meta, mcs)
-        if metaattrs: # Implicitly derive a new metaclass:
-            mcs = type(clsname + '.type', metabases, metaattrs)
+        ## if metaattrs: # Implicitly derive a new metaclass:
+        mcs = type(clsname + '.type', metabases, metaattrs)
         return base.type.__new__(mcs, clsname, bases, clsattrs)
 
     def __init__(cls, clsname, bases, clsattrs):
