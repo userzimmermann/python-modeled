@@ -35,6 +35,8 @@ class Type(type):
         """
         return type(cls)
 
+    meta = type
+
 Type.__name__ = 'base.type'
 
 
