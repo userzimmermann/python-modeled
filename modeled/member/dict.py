@@ -32,7 +32,7 @@ class Type(member.type):
     def __getitem__(cls, mtypes):
         return member.type.__getitem__(cls, mdict[mtypes])
 
-Type.__name__ = 'member.list.type'
+Type.__name__ = 'member.dict.type'
 
 
 class Dict(with_metaclass(Type, member)):
