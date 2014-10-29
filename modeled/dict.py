@@ -36,7 +36,7 @@ class Type(typed.base.type):
 
     @cached
     def __getitem__(cls, mtypes):
-        return typed.Type.__getitem__(cls, mtuple[mtypes])
+        return typed.base.type.__getitem__(cls, mtuple[mtypes])
 
 Type.__name__ = 'dict.type'
 
