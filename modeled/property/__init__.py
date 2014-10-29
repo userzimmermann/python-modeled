@@ -160,3 +160,6 @@ def getmodeledproperties(obj):
 
 from .list import List
 property.list = List
+
+from .dict import Dict
+property.dict = Dict
