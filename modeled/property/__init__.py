@@ -109,7 +109,7 @@ class property(with_metaclass(Type, member)):
     def __get__(self, obj, owner=None):
         """Get the current property value via defined getter function.
         """
-        if not obj: # ==> Accessed from modeled.object class level
+        if obj is None: # ==> Accessed from modeled.object class level
             return self
         if not self.fget:
             raise type(self).error("'%s' has no getter." % self.name)

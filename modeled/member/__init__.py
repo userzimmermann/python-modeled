@@ -184,7 +184,7 @@ class member(with_metaclass(Type, typed.base)):
     def __get__(self, obj, owner=None):
         """Get the current member value (stored in `obj.__dict__`).
         """
-        if not obj: # ==> Accessed from modeled.object class level
+        if obj is None: # ==> Accessed from modeled.object class level
             return self
         # Get the instancemember for the given object...
         im = obj.__dict__[self.name]
