@@ -71,6 +71,10 @@ class Type(base.type):
                 elif ismodeledmember(obj):
                     if not obj.name:
                         obj.name = name
+                    # also explicitly assign
+                    #  (was maybe only added to clsattrs dict
+                    #   by some derived metaclass)
+                    setattr(cls, name, obj)
                     yield obj
 
         options = clsattrs.get('model') # The user-defined model options
