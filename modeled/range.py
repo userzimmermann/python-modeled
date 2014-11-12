@@ -95,11 +95,11 @@ class range(with_metaclass(Type, typed.base)):
     def __contains__(self, value):
         return value in iter(self)
 
-    def __array__(self):
+    def __array__(self, dtype=None):
         import numpy
         # extra iter() because list() tries .__len__(),
         #  which also creates list
-        return numpy.array(list(iter(self)))
+        return numpy.array(list(iter(self)), dtype=dtype)
 
     def __repr__(self):
         cls = type(self)
