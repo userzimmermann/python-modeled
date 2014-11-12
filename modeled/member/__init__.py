@@ -275,6 +275,9 @@ class instancemember(object):
     def __getitem__(self, key):
         return type(self)(self.m[key], self.minstance)
 
+    def __iter__(self):
+        raise TypeError("modeled.instancemember is not iterable")
+
     def __repr__(self):
         return 'instancemember(%s)' % repr(self.m)
 
