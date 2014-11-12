@@ -88,6 +88,10 @@ class range(with_metaclass(Type, typed.base)):
             yield value
             value = self.inc(value, step)
 
+    def __len__(self):
+        # extra iter() because list() tries .__len__() ==> endless recursion
+        return len(list(iter(self)))
+
     def __contains__(self, value):
         return value in iter(self)
 
