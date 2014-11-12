@@ -24,7 +24,9 @@ from six import with_metaclass
 __all__ = [
   'MembersDict', 'MemberError', 'member',
   'InstanceMembersDict', 'instancemember',
-  'ismodeledmemberclass', 'ismodeledmember', 'getmodeledmembers']
+  'ismodeledmemberclass', 'ismodeledmember',
+  'ismodeledinstancemember',
+  'getmodeledmembers']
 
 from six.moves import builtins
 from collections import OrderedDict
@@ -295,6 +297,12 @@ def ismodeledmember(obj):
     """Checks if `obj` is an instance of :class:`modeled.member`.
     """
     return isinstance(obj, member)
+
+
+def ismodeledinstancemember(obj):
+    """Checks if `obj` is an instance of :class:`modeled.instancemember`.
+    """
+    return isinstance(obj, instancemember)
 
 
 def getmodeledmembers(obj, properties=True):
