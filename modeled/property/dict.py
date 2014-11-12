@@ -155,11 +155,12 @@ class Dict(with_metaclass(Type, property)):
 
     @cached
     def __getitem__(self, key):
-        if not istuple(key):
-            key = key,
-        name = '%s[%s]' % (self.name, ', '.join(map(repr(key))))
+        if istuple(key):
+            name = '%s[%s]' % (self.name, ', '.join(map(repr, key)))
+        else:
+            name = '%s[%s]' % (self.name, repr(key))
 
-        @property(self.mtype, name=name)
+        @property(self.mvaluetype, name=name)
         def item(minstance):
             return DictProxy(self, minstance)[key]
 
