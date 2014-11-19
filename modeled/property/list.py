@@ -31,7 +31,7 @@ class ListProxy(object):
         self.minstance = minstance
 
     def __getitem__(self, index):
-        """Get the current list property index value
+        """Get the current list property value at given `index`
            via defined getter function.
         """
         index = int(index)
