@@ -76,7 +76,8 @@ class ListProxy(object):
 
 
 class List(property):
-    def __init__(self, mtype=None, fget=None, fset=None, flen=None,
+    def __init__(self, mtype=None, fget=None, fset=None,
+                 flen=None, len=None,
                  **options):
         if mtype is None:
             assert(self.mtype)
@@ -85,7 +86,10 @@ class List(property):
         member.__init__(self, **options)
         self.fget = fget
         self.fset = fset
-        self.flen = flen
+        if len is not None:
+            self.flen = lambda self: len
+        else:
+            self.flen = flen
 
     def len(self, flen):
         """The .len decorator function.
