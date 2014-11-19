@@ -128,7 +128,7 @@ class Dict(with_metaclass(Type, property)):
         return self.mtype.mtypes[1]
 
     def __init__(self, mkeytype=None, mvaluetype=None,
-                 fget=None, fset=None, fkeys=None,
+                 fget=None, fset=None, fkeys=None, keys=None,
                  **options):
         if mkeytype is None and mvaluetype is None:
             assert(self.mtype)
@@ -137,7 +137,10 @@ class Dict(with_metaclass(Type, property)):
         member.__init__(self, **options)
         self.fget = fget
         self.fset = fset
-        self.fkeys = fkeys
+        if keys is not None:
+            self.fkeys = lambda self: keys
+        else:
+            self.fkeys = fkeys
         if self.new is self.mtype:
             self.new = self.mvaluetype
 
