@@ -25,6 +25,8 @@ from six import with_metaclass
 
 __all__ = ['object', 'ismodeledclass', 'ismodeledobject']
 
+from inspect import isclass
+
 from .model import Model
 from .member import ismodeledmemberclass, ismodeledmember
 from .meta import ismetamethod, ismetaclassmethod
@@ -122,10 +124,9 @@ class object(with_metaclass(Type, base)):
 def ismodeledclass(cls):
     """Checks if `cls` is a subclass of :class:`modeled.object`.
     """
-    try:
-        return issubclass(cls, object)
-    except TypeError: # No class at all
+    if not isclass(cls):
         return False
+    return issubclass(cls, object)
 
 
 def ismodeledobject(obj):
