@@ -43,11 +43,16 @@ class Type(base.type):
         Type.__name__ = '%s[%s].type' % (cls.__name__, mclass.__name__)
 
         class Adapter(with_metaclass(Type, cls, mclass)):
+            # Reset __new__ from base Adapter.__new__
+            # (adapting modeled instances)
+            # to <adapted modeled class>.__new__ (instantiating class)
             __new__ = mclass.__new__
 
             def __init__(self, *args, **membervalues):
+                # first delegate to __init__ of adapted modeled class
                 mclass.__init__(self, **membervalues)
                 self.minstance = self
+                # and then to adapter's additional __init__
                 cls.__init__(self, *args)
 
         Adapter.mclass = mclass
