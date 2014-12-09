@@ -43,7 +43,7 @@ class Type(base.type):
         Type.__name__ = '%s[%s].type' % (cls.__name__, mclass.__name__)
 
         class Adapter(with_metaclass(Type, cls, mclass)):
-            __new__ = object.__new__
+            __new__ = mclass.__new__
 
             def __init__(self, *args, **membervalues):
                 mclass.__init__(self, **membervalues)
