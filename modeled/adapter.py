@@ -68,6 +68,6 @@ class Adapter(with_metaclass(Type, base)):
                     raise TypeError
                 self.minstance = minstance
                 self.model = minstance.model
-                cls.__init__(self, *args)
+                ## cls.__init__(self, *args)
 
         return base.__new__(Adapter)
