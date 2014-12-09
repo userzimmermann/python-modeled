@@ -116,7 +116,7 @@ class object(with_metaclass(Type, base)):
 
     def __init__(self, **membervalues):
         for name, value in membervalues.items():
-            setattr(self, name, value)
+            self.m[name].value = value
 
     @property
     def m(self):
