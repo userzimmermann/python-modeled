@@ -29,6 +29,7 @@ __all__ = [
   'getmodeledmembers']
 
 from six.moves import builtins
+from inspect import isclass
 from collections import OrderedDict
 
 from moretools import cached, simpledict
@@ -287,10 +288,9 @@ class instancemember(object):
 def ismodeledmemberclass(cls):
     """Checks if `cls` is a subclass of :class:`modeled.member`.
     """
-    try:
-        return issubclass(cls, member)
-    except TypeError: # No class at all
+    if not isclass(cls):
         return False
+    return issubclass(cls, member)
 
 
 def ismodeledmember(obj):
