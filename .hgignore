@@ -10,6 +10,7 @@
 
 ^\.tox/
 
+^build/
 ^dist/
 \.egg-info/
 \.conda/
