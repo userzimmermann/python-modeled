@@ -70,4 +70,4 @@ class Adapter(with_metaclass(Type, base)):
                 self.model = minstance.model
                 cls.__init__(self, *args)
 
-        return object.__new__(Adapter, minstance, *args)
+        return base.__new__(Adapter)
