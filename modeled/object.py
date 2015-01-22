@@ -27,10 +27,13 @@ __all__ = ['object', 'ismodeledclass', 'ismodeledobject']
 
 from inspect import isclass
 
+from moretools import cached
+
 from .model import Model
 from .member import ismodeledmemberclass, ismodeledmember
 from .meta import ismetamethod, ismetaclassmethod
 from .base import base
+from .extension import ExtensionDeco
 
 
 class Type(base.type):
@@ -53,6 +56,7 @@ class Type(base.type):
             metabases = (mcs,)
         else:
             metabases = (meta, mcs)
+        metabases += tuple(b.meta for b in bases if b.meta is not mcs)
         ## if metaattrs: # Implicitly derive a new metaclass:
         mcs = type(clsname + '.type', metabases, metaattrs)
         return base.type.__new__(mcs, clsname, bases, clsattrs)
@@ -101,6 +105,12 @@ class Type(base.type):
         setattr(cls, func.__name__, classmethod(func))
         return func
 
+    @property
+    @cached
+    def extension(cls):
+        return ExtensionDeco(cls)
+
+
 Type.__name__ = 'object.type'
 
 
@@ -117,6 +127,18 @@ class object(with_metaclass(Type, base)):
     def __init__(self, **membervalues):
         for name, value in membervalues.items():
             self.m[name].value = value
+
+        extclasses = []
+        for extclass, extdeco in self.model.extensions.items():
+            if extdeco.check(self):
+                extclasses.append(extclass)
+        if extclasses:
+            meta = type('meta', tuple(ext.meta for ext in extclasses), {})
+            self.__class__ = type(self).type(self.model.name,
+              tuple(extclasses) + (type(self), ), {
+                '__module__': type(self).__module__,
+                'meta': meta,
+                })
 
     @property
     def m(self):

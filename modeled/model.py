@@ -23,6 +23,8 @@ __all__ = ['Model']
 
 from inspect import getmembers
 
+from moretools import DictStruct
+
 
 class modelbase(object):
     def __init__(self, minstance):
@@ -73,9 +75,13 @@ class Model(type):
                 except AttributeError:
                     pass
 
+        bases = tuple(bases())
         return type.__new__(
-          mcs, '%s.model' % mclass.__name__, tuple(bases()) or (modelbase,), {
+          mcs, '%s.model' % mclass.__name__, bases or (modelbase,), {
             '__module__': mclass.__module__,
+            'extensions': DictStruct(
+              '%s.model.extensions' % mclass.__name__,
+              tuple(b.extensions for b in bases)),
             })
 
     def __init__(self, mclass, members=None, options=None):
@@ -107,6 +113,7 @@ class Model(type):
             ## self.members = memberstype(mclass, getmodeledmembers(mclass))
         self.properties = PropertiesDict.struct(model=self, properties=(
           (name, m) for name, m in self.members if ismodeledproperty(m)))
+        # self.extensions = []
 
     def __repr__(self):
         return '%s.model' % self.mclass.__name__
