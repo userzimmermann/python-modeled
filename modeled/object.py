@@ -119,7 +119,7 @@ class object(with_metaclass(Type, base)):
     """
     __module__ = 'modeled'
 
-    def __new__(cls, **membervalues):
+    def __new__(cls, *args, **kwargs):
         self = base.__new__(cls)
         self.model = self.model(minstance=self)
         return self
