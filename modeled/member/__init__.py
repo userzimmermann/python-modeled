@@ -39,6 +39,7 @@ from modeled.options import Options
 from modeled.model import modelbase
 from modeled import typed
 
+from .handlers import Handlers
 from .context import context
 
 
@@ -166,12 +167,9 @@ class member(with_metaclass(Type, typed.base)):
         try:
             changed = options.pop('changed')
         except KeyError:
-            self.changed = []
+            self.changed = Handlers()
         else:
-            if callable(changed):
-                self.changed = [changed]
-            else:
-                self.changed = builtins.list(changed)
+            self.changed = Handlers(changed)
         # If no explicit name is given, the associated class attribute name
         # will be used and assigned in modeled.object.type.__init__:
         self.name = options.pop('name', None)
@@ -256,7 +254,7 @@ class instancemember(object):
     def __init__(self, m, minstance):
         self.m = m
         self.minstance = minstance
-        self.changed = []
+        self.changed = Handlers()
 
     @property
     def name(self):
