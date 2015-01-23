@@ -87,6 +87,19 @@ class DictProxy(object):
         else:
             args = key, value
         self.p.fset(self.minstance, *args)
+        # Finally call hook functions... first own (modeled class level)...
+        for func in self.p.changed:
+            func(self.minstance, value)
+        #... then instancemember level:
+        submember = self.p[key]
+        try:
+            # Get the instancemember for the given object...
+            im = self.minstance.__dict__[submember.name]
+        except KeyError:
+            pass
+        else:
+            for func in im.changed:
+                func(value)
 
     def update(self, mapping=(), **items):
         if isdict(mapping):
