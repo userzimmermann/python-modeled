@@ -134,6 +134,14 @@ class property(with_metaclass(Type, member)):
             raise type(self).error(
               "Not a valid choice for '%s': %s" % (self.name, repr(value)))
         self.fset(obj, value)
+        # Get the instancemember for the given object...
+        im = obj.__dict__[self.name]
+        # Finally call hook functions... first own (modeled class level)...
+        for func in self.changed:
+            func(obj, value)
+        #... then instancemember level:
+        for func in im.changed:
+            func(value)
 
 
 def ismodeledproperty(obj):
