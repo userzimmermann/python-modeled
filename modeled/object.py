@@ -105,6 +105,15 @@ class Type(base.type):
         setattr(cls, func.__name__, classmethod(func))
         return func
 
+    def property(cls, func):
+        setattr(cls, func.__name__, property(func))
+        return func
+
+    @classmethod
+    def metaproperty(mcs, func):
+        setattr(mcs, func.__name__, property(func))
+        return func
+
     @property
     @cached
     def extension(cls):
