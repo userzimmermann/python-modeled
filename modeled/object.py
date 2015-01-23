@@ -59,6 +59,9 @@ class Type(base.type):
         metabases += tuple(b.meta for b in bases if b.meta is not mcs)
         ## if metaattrs: # Implicitly derive a new metaclass:
         mcs = type(clsname + '.type', metabases, metaattrs)
+
+        mcs.Exception = type('%s.Exception', clsname, (Exception, ), {})
+
         return base.type.__new__(mcs, clsname, bases, clsattrs)
 
     def __init__(cls, clsname, bases, clsattrs):
@@ -119,6 +122,14 @@ class Type(base.type):
     def extension(cls):
         return ExtensionDeco(cls)
 
+    def exception(cls, errclass):
+        mcs = type(cls)
+        if mcs.Exception not in errclass.mro():
+            errclass = type(
+              '%s.%s' % (cls.__name__, base.__name__),
+              (errclass, mcs.Exception), {})
+        setattr(mcs, errclass.__name__, errclass)
+        return errclass
 
 Type.__name__ = 'object.type'
 
