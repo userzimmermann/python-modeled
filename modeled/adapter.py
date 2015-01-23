@@ -50,10 +50,10 @@ class Type(base.type):
 
             def __init__(self, *args, **membervalues):
                 # first delegate to __init__ of adapted modeled class
-                mclass.__init__(self, **membervalues)
+                mclass.__init__(self, *args, **membervalues)
                 self.minstance = self
                 # and then to adapter's additional __init__
-                cls.__init__(self, *args)
+                cls.__init__(self)
 
         Adapter.mclass = mclass
         Adapter.__module__ = cls.__module__
