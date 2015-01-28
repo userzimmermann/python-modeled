@@ -39,3 +39,12 @@ class Handlers(list):
         else:
             #==> multiple handlers
             self.extend(items)
+
+    def __isub__(self, items):
+        if callable(items) and not isinstance(items, Handlers):
+            #==> single handler
+            self.remove(items)
+        else:
+            #==> multiple handlers
+            for item in items:
+                self.remove(item)
