@@ -60,7 +60,7 @@ class Type(base.type):
         ## if metaattrs: # Implicitly derive a new metaclass:
         mcs = type(clsname + '.type', metabases, metaattrs)
 
-        mcs.Exception = type('%s.Exception', clsname, (Exception, ), {})
+        mcs.Exception = type('%s.Exception' % clsname, (Exception, ), {})
 
         return base.type.__new__(mcs, clsname, bases, clsattrs)
 
@@ -90,26 +90,29 @@ class Type(base.type):
         model = cls.type.model # The modeled object type's model metaclass
         cls.model = model(mclass=cls, members=members(), options=options)
 
-    @classmethod
-    def metamethod(mcs, func):
-        setattr(mcs, func.__name__, func)
-        return func
+    @property
+    @cached
+    def extension(cls):
+        return ExtensionDeco(cls)
+
+    def exception(cls, errclass):
+        errname = errclass.__name__
+        # create subclass with cls.Exception base if not based yet
+        if not issubclass(errclass, cls.Exception):
+            errclass = type(errclass.__name__,
+              (errclass, cls.Exception), {})
+        errclass.__qualname__ = '%s.%s' % (cls.__name__, errclass.__name__)
+        setattr(type(cls), errname, errclass)
+        return errclass
 
     @classmethod
     def metaclassmethod(mcs, func):
         setattr(mcs, func.__name__, classmethod(func))
         return func
 
-    def method(cls, func):
-        setattr(cls, func.__name__, func)
-        return func
-
-    def classmethod(cls, func):
-        setattr(cls, func.__name__, classmethod(func))
-        return func
-
-    def property(cls, func):
-        setattr(cls, func.__name__, property(func))
+    @classmethod
+    def metamethod(mcs, func):
+        setattr(mcs, func.__name__, func)
         return func
 
     @classmethod
@@ -117,19 +120,17 @@ class Type(base.type):
         setattr(mcs, func.__name__, property(func))
         return func
 
-    @property
-    @cached
-    def extension(cls):
-        return ExtensionDeco(cls)
+    def classmethod(cls, func):
+        setattr(cls, func.__name__, classmethod(func))
+        return func
 
-    def exception(cls, errclass):
-        mcs = type(cls)
-        if mcs.Exception not in errclass.mro():
-            errclass = type(
-              '%s.%s' % (cls.__name__, base.__name__),
-              (errclass, mcs.Exception), {})
-        setattr(mcs, errclass.__name__, errclass)
-        return errclass
+    def method(cls, func):
+        setattr(cls, func.__name__, func)
+        return func
+
+    def property(cls, func):
+        setattr(cls, func.__name__, property(func))
+        return func
 
 Type.__name__ = 'object.type'
 
