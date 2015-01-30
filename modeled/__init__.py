@@ -62,6 +62,9 @@ ismdict = ismodeleddict
 from .range import *
 mrange = range
 
+from .datetime import *
+mdatetime = datetime
+
 from .namedtuple import *
 
 from .simpledict import *
