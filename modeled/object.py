@@ -30,7 +30,7 @@ from inspect import isclass
 from moretools import cached
 
 from .model import Model
-from .member import ismodeledmemberclass, ismodeledmember
+from .member import ismodeledmemberclass, ismodeledmember, instancemember
 from .meta import ismetamethod, ismetaclassmethod
 from .base import base
 from .extension import ExtensionDeco
@@ -153,6 +153,9 @@ class object(with_metaclass(Type, base)):
         for extclass, extdeco in self.model.extensions.items():
             if extdeco.check(self):
                 extclasses.append(extclass)
+                for name, m in extclass.model.members:
+                    self.m[name] = self.__dict__[name] \
+                      = instancemember(m, self)
         if extclasses:
             meta = type('meta', tuple(ext.meta for ext in extclasses), {})
             self.__class__ = type(self).type(self.model.name,
