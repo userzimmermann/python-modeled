@@ -7,7 +7,7 @@ python-modeled
 
     >>> import modeled
     >>> print(modeled.__version__) 
-    0.0.40.16
+    0.1
 
 
 .. code:: python
@@ -55,8 +55,8 @@ requirements:
 
     >>> modeled.__requires__
     six
-    path.py
-    moretools>=0.1a38
+    path.py>=7.0
+    moretools>=0.1.5
 
 
 
