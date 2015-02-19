@@ -27,7 +27,7 @@ __all__ = ['object', 'ismodeledclass', 'ismodeledobject']
 
 from inspect import isclass
 
-from moretools import cached
+from moretools import cached, qualname
 
 from .model import Model
 from .member import ismodeledmemberclass, ismodeledmember, instancemember
@@ -43,20 +43,26 @@ class Type(base.type):
 
     model = Model # The basic model info metaclass
 
-    def __new__(mcs, clsname, bases, clsattrs):
+    def __new__(mcs, clsname=None, bases=None, clsattrs=None, **kwargs):
         metaattrs = {}
         for name, obj in list(clsattrs.items()):
             if ismetamethod(obj):
                 metaattrs[name] = clsattrs.pop(name).func
             elif ismetaclassmethod(obj):
                 metaattrs[name] = classmethod(clsattrs.pop(name).func)
+        # try:
+        #     meta = clsattrs.pop('meta')
+        # except KeyError:
+        #     metabases = (mcs,)
+        # else:
+        #     metabases = (meta, mcs)
+        metabases = tuple(type(b) for b in bases) # if type(b) is not mcs)
+        if not any(issubclass(mb, mcs) for mb in metabases):
+            metabases = (mcs, ) + metabases
         try:
-            meta = clsattrs.pop('meta')
+            metabases = (clsattrs.pop('meta'), ) + metabases
         except KeyError:
-            metabases = (mcs,)
-        else:
-            metabases = (meta, mcs)
-        metabases += tuple(b.meta for b in bases if b.meta is not mcs)
+            pass
         ## if metaattrs: # Implicitly derive a new metaclass:
         mcs = type(clsname + '.type', metabases, metaattrs)
 
@@ -89,6 +95,36 @@ class Type(base.type):
         options = clsattrs.get('model') # The user-defined model options
         model = cls.type.model # The modeled object type's model metaclass
         cls.model = model(mclass=cls, members=members(), options=options)
+
+    @cached
+    def __getitem__(cls, bases):
+        """Get a modeled class derived from the given `bases`,
+           which can be (mixed) modeled and non-modeled classes.
+
+        - Results are cached.
+        - Needed in Python 3 for deriving from more than one modeled class:
+
+        .. code:: python
+
+            class Derived(ModeledBaseOne, ModeledBaseTwo):
+                # results in metaclass conflict!
+
+            class Derived(modeled.object[ModeledBaseOne, ModeledBaseTwo]):
+                # works!
+                ...
+        """
+        mcs = type(cls)
+        if not isinstance(bases, tuple):
+            bases = bases,
+        metabases = tuple(type(b) for b in bases) # if type(b) is not mcs)
+        if not any(issubclass(mb, mcs) for mb in metabases):
+            metabases = (mcs, ) + metabases
+        if not any(issubclass(b, cls) for b in bases):
+            bases = (cls, ) + bases
+        clsname = '%s[%s]' % (qualname(cls), ', '.join(map(qualname, bases)))
+        clsattrs = {'__module__': cls.__module__}
+        meta = type(clsname + '.meta', metabases, clsattrs)
+        return meta(clsname, bases, clsattrs)
 
     @property
     @cached
