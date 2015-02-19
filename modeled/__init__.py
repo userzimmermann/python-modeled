@@ -74,7 +74,7 @@ from .options import *
 from .meta import *
 
 from .object import *
-mobject = object
+M = mobject = object
 
 from .member import *
 m = member
