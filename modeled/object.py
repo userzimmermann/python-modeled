@@ -116,8 +116,8 @@ class Type(base.type):
         mcs = type(cls)
         if not isinstance(bases, tuple):
             bases = bases,
-        clsname = '%s[%s]' % (
-          qualname(cls), ', '.join(map(qualname, bases)))
+        basenames = ', '.join(map(qualname, bases))
+        clsname = '%s[%s]' % (cls.__name__, basenames)
         metabases = tuple(type(b) for b in bases) # if type(b) is not mcs)
         if not any(issubclass(mb, mcs) for mb in metabases):
             metabases = (mcs, ) + metabases
@@ -125,7 +125,10 @@ class Type(base.type):
             bases = (cls, ) + bases
         clsattrs = {'__module__': cls.__module__}
         meta = type(clsname + '.meta', metabases, clsattrs)
-        return meta(clsname, bases, clsattrs)
+        cls = meta(clsname, bases, clsattrs)
+        cls.__qualname__ = '%s[%s]' % (qualname(cls), basenames)
+        meta.__qualname__ = cls.__qualname__ + '.meta'
+        return cls
 
     @property
     @cached
