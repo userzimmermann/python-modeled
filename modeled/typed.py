@@ -23,7 +23,7 @@ from six import with_metaclass
 
 __all__ = ['base']
 
-from inspect import getfullargspec, isclass
+from inspect import isclass
 
 from decorator import decorator
 from moretools import cached, qualname
@@ -85,6 +85,7 @@ class base(with_metaclass(Type, base)):
 
 
 def typed(func):
+    from inspect import getfullargspec
     spec = getfullargspec(func)
 
     def typed(func, *args, **kwargs):
