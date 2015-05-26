@@ -8,3 +8,6 @@ include requirements.txt
 include README.md
 
 include tox.ini
+
+exclude .hg*
+exclude *.yml
