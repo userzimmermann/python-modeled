@@ -82,6 +82,8 @@ m = member
 from .property import *
 mproperty = property
 
+from .typed import typed
+
 from .cfunc import *
 mcfunc = cfunc
 mcarg = cfunc.arg
