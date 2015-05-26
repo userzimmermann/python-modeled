@@ -23,7 +23,10 @@ from six import with_metaclass
 
 __all__ = ['base']
 
-from moretools import cached
+from inspect import getfullargspec, isclass
+
+from decorator import decorator
+from moretools import cached, qualname
 
 from .base import base
 
@@ -77,5 +80,27 @@ class base(with_metaclass(Type, base)):
             return value
         raise TypeError(
           "%s.new.func() must return an instance of '%s', not '%s'"
-          % (type(self).__name__, self.mtype.__name__,
-             type(value).__name__))
+          % (qualname(type(self)), qualname(self.mtype),
+             qualname(type(value))))
+
+
+def typed(func):
+    spec = getfullargspec(func)
+
+    def typed(func, *args, **kwargs):
+        iargs = iter(args)
+        args = []
+        for name, value in zip(spec.args, iargs):
+            mtype = wrapper.mtypes.get(name)
+            if isclass(mtype) and not isinstance(value, mtype):
+                value = mtype(value)
+            args.append(value)
+        result = func(*args, **kwargs)
+        mtype = wrapper.mtypes.get('return')
+        if isclass(mtype) and not isinstance(result, mtype):
+            result = mtype(result)
+        return result
+
+    wrapper = decorator(typed, func)
+    wrapper.mtypes = spec.annotations
+    return wrapper
