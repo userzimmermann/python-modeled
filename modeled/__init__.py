@@ -20,21 +20,13 @@
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
 
-from zetup import find_zetup_config
+import zetup
 
-
-zfg = find_zetup_config(__name__)
-
-__distribution__ = zfg.DISTRIBUTION.find(__path__[0])
-__description__ = zfg.DESCRIPTION
-
-__version__ = zfg.VERSION
-__requires__ = zfg.REQUIRES.checked
-
+zetup.annotate(__name__)
 
 import sys
 
-from path import path as Path
+from path import Path
 
 
 for path in (Path(p) / 'modeled' for p in sys.path):
