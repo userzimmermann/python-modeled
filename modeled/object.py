@@ -59,16 +59,18 @@ class Type(base.type):
         metabases = tuple(type(b) for b in bases) # if type(b) is not mcs)
         if not any(issubclass(mb, mcs) for mb in metabases):
             metabases = (mcs, ) + metabases
-        try:
-            metabases = (clsattrs.pop('meta'), ) + metabases
-        except KeyError:
-            pass
+        meta = clsattrs.pop('meta', None)
+        if meta:
+            metabases = (meta, ) + metabases
         ## if metaattrs: # Implicitly derive a new metaclass:
         mcs = type(clsname + '.type', metabases, metaattrs)
 
         mcs.Exception = type('%s.Exception' % clsname, (Exception, ), {})
 
-        return base.type.__new__(mcs, clsname, bases, clsattrs)
+        cls = base.type.__new__(mcs, clsname, bases, clsattrs)
+        if meta:
+            clsattrs['meta'] = meta
+        return cls
 
     def __init__(cls, clsname, bases, clsattrs):
         """Finish a :class:`modeled.object`-derived `cls`.
