@@ -10,7 +10,7 @@ install:
   - pip install zetup[all]
   - pip install pytest
   - pip install tox
-  - pip install -e .
+  - zetup install
 
 script:
   - zetup pytest
