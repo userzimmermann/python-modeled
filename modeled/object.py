@@ -56,7 +56,8 @@ class Type(base.type):
         #     metabases = (mcs,)
         # else:
         #     metabases = (meta, mcs)
-        metabases = tuple(type(b) for b in bases) # if type(b) is not mcs)
+        metabases = tuple(type(b) for b in bases if issubclass(b, object))
+                          ## if type(b) is not mcs)
         if not any(issubclass(mb, mcs) for mb in metabases):
             metabases = (mcs, ) + metabases
         meta = clsattrs.pop('meta', None)
