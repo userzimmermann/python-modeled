@@ -121,7 +121,8 @@ class Type(base.type):
             bases = bases,
         basenames = ', '.join(map(qualname, bases))
         clsname = '%s[%s]' % (cls.__name__, basenames)
-        metabases = tuple(type(b) for b in bases) # if type(b) is not mcs)
+        metabases = tuple(type(b) for b in bases if issubclass(b, object))
+                          ## if type(b) is not mcs)
         if not any(issubclass(mb, mcs) for mb in metabases):
             metabases = (mcs, ) + metabases
         if not any(issubclass(b, cls) for b in bases):
