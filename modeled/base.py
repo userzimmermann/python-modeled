@@ -1,6 +1,6 @@
 # python-modeled
 #
-# Copyright (C) 2014 Stefan Zimmermann <zimmermann.code@gmail.com>
+# Copyright (C) 2015 Stefan Zimmermann <zimmermann.code@gmail.com>
 #
 # python-modeled is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -17,30 +17,37 @@
 
 """modeled.base
 
+Base class and metaclass for all modeled components.
+
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
 from six import with_metaclass
+from warnings import warn
 
-__all__ = ['base']
+__all__ = ['metabase', 'base']
 
 
-class Type(type):
+class metabase(type):
     """Base metaclass for all :mod:`modeled` components.
     """
     __module__ = 'modeled'
 
     @property
-    def type(cls):
-        """Get the metaclass of `cls` with `.type`.
+    def meta(cls):
+        """Get the metaclass (type) of `cls`.
         """
         return type(cls)
 
-    meta = type
+    @property
+    def type(cls):
+        """Get the metaclass (type) of `cls`.
+        """
+        warn("'%s.type' property is deprecated. Use '%s.meta' instead."
+             % (cls, cls), DeprecationWarning)
+        return cls.meta
 
-Type.__name__ = 'base.type'
 
-
-class base(with_metaclass(Type, object)):
+class base(with_metaclass(metabase, object)):
     """Base class for all :mod:`modeled` components.
     """
     __module__ = 'modeled'
