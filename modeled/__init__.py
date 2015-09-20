@@ -19,65 +19,71 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-
-import zetup
-
-zetup.annotate(__name__)
+__import__('zetup').annotate(__name__)
 
 import sys
-
 from path import Path
-
-
 for path in (Path(p) / 'modeled' for p in sys.path):
     if path.isdir():
         __path__.append(path.realpath())
+del sys, path, Path
 
 
-from .base import *
-
-from .tuple import *
+from .tuple import tuple, ismodeledtupleclass, ismodeledtuple
 mtuple = tuple
 ismtupleclass = ismodeledtupleclass
 ismtuple = ismodeledtuple
 
-from .list import *
+from .list import list, ismodeledlistclass, ismodeledlist
 mlist = list
 ismlistclass = ismodeledlistclass
 ismlist = ismodeledlist
 
-from .dict import *
+from .dict import dict, ismodeleddictclass, ismodeleddict
 mdict = dict
 ismdictclass = ismodeleddictclass
 ismdict = ismodeleddict
 
-from .range import *
+from .range import range
 mrange = range
 
-from .datetime import *
+from .datetime import datetime
 mdatetime = datetime
 
-from .namedtuple import *
+from .namedtuple import namedtuple
 
-from .simpledict import *
+from .simpledict import simpledict
 
-from .options import *
+from .options import OptionError, Options
 
-from .meta import *
+from .meta import (
+    meta, metamethod, metaclassmethod, ismetamethod, ismetaclassmethod,
+)
 
-from .object import *
+from .object import object, ismodeledclass, ismodeledobject
 M = mobject = object
 
-from .member import *
+from .member import (
+    MembersDict, MemberError, member,
+    InstanceMembersDict, instancemember,
+    ismodeledmemberclass, ismodeledmember, ismodeledinstancemember,
+    getmodeledmembers,
+)
 m = member
 
-from .property import *
+from .property import (
+    PropertyError, PropertiesDict, property,
+    ismodeledproperty, getmodeledproperties,
+)
 mproperty = property
 
 from .typed import typed
 
-from .cfunc import *
+from .cfunc import (
+    cfunc, ismodeledcfuncclass, ismodeledcfuncresult,
+    CFuncArgError, ismodeledcfuncarg, getmodeledcfuncargs,
+)
 mcfunc = cfunc
 mcarg = cfunc.arg
 
-from .adapter import *
+from .adapter import Adapter
