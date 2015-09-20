@@ -1,6 +1,6 @@
 # python-modeled
 #
-# Copyright (C) 2015 Stefan Zimmermann <zimmermann.code@gmail.com>
+# Copyright (C) 2014-2015 Stefan Zimmermann <zimmermann.code@gmail.com>
 #
 # python-modeled is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by

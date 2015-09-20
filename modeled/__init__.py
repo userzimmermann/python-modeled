@@ -1,6 +1,6 @@
 # python-modeled
 #
-# Copyright (C) 2014 Stefan Zimmermann <zimmermann.code@gmail.com>
+# Copyright (C) 2014-2015 Stefan Zimmermann <zimmermann.code@gmail.com>
 #
 # python-modeled is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -23,6 +23,7 @@ __import__('zetup').annotate(__name__)
 
 import sys
 from path import Path
+# search sys.path for other packages using modeled namespace
 for path in (Path(p) / 'modeled' for p in sys.path):
     if path.isdir():
         __path__.append(path.realpath())
