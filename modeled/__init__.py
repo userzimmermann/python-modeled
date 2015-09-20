@@ -59,6 +59,7 @@ from .options import OptionError, Options
 
 from .meta import (
     meta, metamethod, metaclassmethod, ismetamethod, ismetaclassmethod,
+    ismodeledmetaclass,
 )
 
 from .object import object, ismodeledclass, ismodeledobject

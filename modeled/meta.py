@@ -32,6 +32,7 @@ from .extension import ExtensionDeco
 __all__ = [
     'meta', 'metamethod', 'metaclassmethod',
     'ismetamethod', 'ismetaclassmethod',
+    'ismodeledmetaclass',
 ]
 
 
@@ -206,3 +207,11 @@ def ismetaclassmethod(obj):
     """Check if `obj` is a ``@modeled.metaclassmethod`` instance.
     """
     return isinstance(obj, metaclassmethod)
+
+
+def ismodeledmetaclass(mcs):
+    """Checks if `mcs` is a subclass of :class:`modeled.meta`.
+    """
+    if not isclass(mcs):
+        return False
+    return issubclass(mcs, meta)
