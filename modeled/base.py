@@ -46,6 +46,12 @@ class metabase(type):
              % (cls, cls), DeprecationWarning)
         return cls.meta
 
+    @classmethod
+    def metamro(mcs):
+        """Get method resolution order of metaclass.
+        """
+        return mcs.mro(mcs)
+
 
 class base(with_metaclass(metabase, object)):
     """Base class for all :mod:`modeled` components.
