@@ -23,6 +23,7 @@ Base class and metaclass for all modeled components.
 """
 from six import with_metaclass
 from warnings import warn
+from itertools import chain
 
 __all__ = ['metabase', 'base']
 
@@ -45,6 +46,12 @@ class metabase(type):
         warn("'%s.type' property is deprecated. Use '%s.meta' instead."
              % (cls, cls), DeprecationWarning)
         return cls.meta
+
+    def __dir__(cls):
+        """Return all attribute names from metaclass and class level.
+        """
+        return list(set(chain(
+            super(metabase, cls).__dir__(), dir(type(cls)))))
 
     @classmethod
     def metamro(mcs):
