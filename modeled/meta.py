@@ -151,6 +151,26 @@ class meta(base):
         setattr(type(cls), errname, errclass)
         return errclass
 
+    @property
+    def __abstractmethods__(cls):
+        """Get the names of all abstract methods of this `cls`.
+
+        - Classes with abstract methods may not be instantiated directly.
+        """
+        def abcnames():
+            """Generator.
+            """
+            for name in dir(cls):
+                if name == '__abstractmethods__':
+                    continue
+                obj = getattr(cls, name, None)
+                if obj is None:
+                    continue
+                if getattr(obj, '__isabstractmethod__', False):
+                    yield name
+
+        return tuple(abcnames())
+
     @classmethod
     def metaclassmethod(mcs, func):
         setattr(mcs, func.__name__, classmethod(func))
