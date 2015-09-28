@@ -37,6 +37,11 @@ class object(with_metaclass(meta, base)):
     __module__ = 'modeled'
 
     def __new__(cls, *args, **kwargs):
+        abcnames = cls.__abstractmethods__
+        if abcnames:
+            raise TypeError(
+                "Can't instantiate abstract %s with abstract methods %s"
+                % (repr(cls), ", ".join(map(repr, abcnames))))
         self = base.__new__(cls)
         self.model = self.model(minstance=self)
         return self
