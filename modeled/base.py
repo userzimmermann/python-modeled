@@ -25,14 +25,14 @@ from six import with_metaclass
 from warnings import warn
 from itertools import chain
 
+import zetup
+
 __all__ = ['metabase', 'base']
 
 
-class metabase(type):
+class metabase(zetup.meta):
     """Base metaclass for all :mod:`modeled` components.
     """
-    __module__ = 'modeled'
-
     @property
     def meta(cls):
         """Get the metaclass (type) of `cls`.
@@ -47,12 +47,6 @@ class metabase(type):
              % (cls, cls), DeprecationWarning)
         return cls.meta
 
-    def __dir__(cls):
-        """Return all attribute names from metaclass and class level.
-        """
-        return list(set(chain(
-            super(metabase, cls).__dir__(), dir(type(cls)))))
-
     @classmethod
     def metamro(mcs):
         """Get method resolution order of metaclass.
@@ -60,7 +54,6 @@ class metabase(type):
         return mcs.mro(mcs)
 
 
-class base(with_metaclass(metabase, object)):
+class base(with_metaclass(metabase, zetup.object)):
     """Base class for all :mod:`modeled` components.
     """
-    __module__ = 'modeled'
