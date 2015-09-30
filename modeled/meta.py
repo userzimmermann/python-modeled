@@ -22,6 +22,8 @@ and tools to define metaclass features on modeled class level.
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
+from itertools import chain
+
 from moretools import cached, qualname, dictitems
 
 from .base import metabase as base
@@ -160,8 +162,14 @@ class meta(base):
         def abcnames():
             """Generator.
             """
-            for name in dir(cls):
+            # don't just iterate dir(cls) as it might contain dynamic members,
+            # which maybe involve cls instantiation on getattr(),
+            # which leads to endless recursion.
+            # and anyway: abstractmethods should always be explicitly defined!
+            for name in set(chain(dir(type(cls)),
+                                  *(c.__dict__ for c in cls.mro())):
                 if name == '__abstractmethods__':
+                    # another way to avoid recursion :)
                     continue
                 obj = getattr(cls, name, None)
                 if obj is None:
