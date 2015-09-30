@@ -167,7 +167,7 @@ class meta(base):
             # which leads to endless recursion.
             # and anyway: abstractmethods should always be explicitly defined!
             for name in set(chain(dir(type(cls)),
-                                  *(c.__dict__ for c in cls.mro())):
+                                  *(c.__dict__ for c in cls.mro()))):
                 if name == '__abstractmethods__':
                     # another way to avoid recursion :)
                     continue
