@@ -174,7 +174,7 @@ class meta(base):
                 obj = getattr(cls, name, None)
                 if obj is None:
                     continue
-                if getattr(obj, '__isabstractmethod__', False):
+                if getattr(obj, '__isabstractmethod__', False) is True:
                     yield name
 
         return tuple(abcnames())
