@@ -46,7 +46,7 @@ class meta(base):
     model = Model # The basic model info metaclass
 
     def __new__(mcs, clsname=None, bases=None, clsattrs=None, **kwargs):
-        metaattrs = {}
+        metaattrs = {'__module__': clsattrs.get('__module__')}
         for name, obj in list(dictitems(clsattrs)):
             if ismetamethod(obj):
                 metaattrs[name] = clsattrs.pop(name).func
