@@ -43,7 +43,7 @@ class object(with_metaclass(meta, base)):
                 "Can't instantiate abstract %s with abstract methods %s"
                 % (repr(cls), ", ".join(map(repr, abcnames))))
         self = base.__new__(cls)
-        self.model = self.model(minstance=self)
+        self.model = cls.model(minstance=self)
         return self
 
     def __init__(self, **membervalues):
