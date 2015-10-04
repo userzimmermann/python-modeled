@@ -12,6 +12,7 @@
 
 ^build/
 ^dist/
+^\.eggs/
 \.egg-info/
 \.conda/
 
