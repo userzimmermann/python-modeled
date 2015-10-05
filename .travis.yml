@@ -1,3 +1,5 @@
+sudo: false
+
 language: python
 python:
   - '2.7'
@@ -6,13 +8,13 @@ python:
   - pypy
 
 install:
-  - pip install -r requirements.txt
-  - pip install zetup[all]
-  - pip install pytest
-  - pip install tox
+  - pip install -r requirements.txt --upgrade
+  - pip install zetup[commands] --upgrade
+  - pip install pytest --upgrade
+  - pip install tox --upgrade
   - zetup install
 
 script:
   - zetup pytest
-  - py.test -v test/
+  - py.test -v test
   - zetup tox
