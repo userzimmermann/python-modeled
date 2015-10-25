@@ -28,7 +28,8 @@ import sys
 import moretools
 from moretools import cached
 
-from modeled import mtuple, mdict
+from modeled.tuple import tuple as mtuple
+from modeled.dict import dict as mdict
 from . import typed
 
 

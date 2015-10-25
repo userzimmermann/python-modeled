@@ -32,8 +32,9 @@ from ctypes import _Pointer
 
 from moretools import cached, simpledict, SimpleDictStructType
 
-import modeled
+from modeled.object import object as mobject
 from modeled.member import MemberError, member
+import modeled.cfunc
 
 
 class ArgsDictStructType(SimpleDictStructType):
@@ -42,7 +43,7 @@ class ArgsDictStructType(SimpleDictStructType):
     def __init__(self, model, args):
         def bases():
             for cls in model.__bases__:
-                if cls is not modeled.object.model:
+                if cls is not mobject.model:
                     yield cls.args
         # Delegates args to SimpleDictType.__init__()
         SimpleDictStructType.__init__( # First arg is struct __name__
@@ -134,9 +135,9 @@ def getmodeledcfuncargs(obj):
        or (name, value) pairs of a :class:`modeled.cfunc` instance
        in arg creation and inheritance order.
     """
-    if modeled.ismodeledcfuncclass(obj):
+    if modeled.cfunc.ismodeledcfuncclass(obj):
         return list(obj.model.args)
-    if modeled.ismodeledcfunc(obj):
+    if modeled.cfunc.ismodeledcfunc(obj):
         return [(name, getattr(obj, name)) for (name, _) in obj.model.args]
     raise TypeError(
       "getmodeledcfuncargs() arg must be a subclass or instance"

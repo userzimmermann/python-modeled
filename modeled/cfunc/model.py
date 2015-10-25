@@ -21,12 +21,12 @@
 """
 __all__ = ['Model']
 
-import modeled
+from modeled.object import object as mobject
 
 from .arg import ArgsDict, ismodeledcfuncarg
 
 
-class Model(modeled.object.model.type):
+class Model(mobject.model.type):
     """Metaclass for :class:`modeled.cfunc.model`.
 
     - Checks user-defined `class model` for `restype` and `cfunc` options.
@@ -35,7 +35,7 @@ class Model(modeled.object.model.type):
 
     def __init__(cls, mclass, members=None, options=None):
         options = Model.options(options)
-        modeled.object.model.type.__init__(cls, mclass, members, options)
+        mobject.model.type.__init__(cls, mclass, members, options)
         cls.args = ArgsDict.struct(model=cls, args=(
           (name, a) for name, a in cls.members if ismodeledcfuncarg(a)))
         if options: # No restype or cfunc option ==> undefined

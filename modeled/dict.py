@@ -27,7 +27,7 @@ from six.moves import builtins
 
 from moretools import cached
 
-from modeled import mtuple
+from modeled.tuple import tuple as mtuple
 from . import typed
 
 

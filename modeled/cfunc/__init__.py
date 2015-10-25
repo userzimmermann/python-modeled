@@ -33,13 +33,13 @@ from ctypes import _Pointer, byref
 # Get byref type with dummy expression:
 _Ref = type(byref(ctypes.c_int()))
 
-import modeled
+from modeled.object import object as mobject
 
 from .model import Model
 from .arg import CFuncArgError, arg, ismodeledcfuncarg, getmodeledcfuncargs
 
 
-class Type(modeled.object.type):
+class Type(mobject.meta):
     """Metaclass for :class:`modeled.cfunc`.
 
     - Provies modeled.cfunc[<restype>, <cfunc>] syntax
@@ -53,7 +53,7 @@ class Type(modeled.object.type):
     arg = arg # modeled.cfunc.arg class
 
     def __init__(cls, clsname, bases, clsattrs):
-        modeled.object.type.__init__(cls, clsname, bases, clsattrs)
+        mobject.meta.__init__(cls, clsname, bases, clsattrs)
         if cls.model.members:
             cls.model.cfunc.argtypes = [
               m.ctype for (name, m) in cls.model.members]
@@ -73,7 +73,7 @@ class Type(modeled.object.type):
 Type.__name__ = 'cfunc.type'
 
 
-class cfunc(with_metaclass(Type, modeled.object)):
+class cfunc(with_metaclass(Type, mobject)):
     """Base class for modeled.cfunc classes.
 
     - Instantiating means calling the associated C function.
@@ -83,7 +83,7 @@ class cfunc(with_metaclass(Type, modeled.object)):
     def __init__(self, *args, **membervalues):
         for arg, (name, _) in zip(args, self.model.args):
             membervalues[name] = arg
-        modeled.object.__init__(self, **membervalues)
+        mobject.__init__(self, **membervalues)
 
         cfunc = self.model.cfunc
         args = []

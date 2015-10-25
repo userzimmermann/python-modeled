@@ -26,7 +26,7 @@ from itertools import chain
 
 from moretools import istuple, isdict, cached
 
-from modeled import mtuple
+from modeled.tuple import tuple as mtuple
 from modeled.member import member
 from . import property
 

@@ -27,7 +27,7 @@ from operator import lt, le
 
 from moretools import cached
 
-from modeled import mtuple
+from modeled.tuple import tuple as mtuple
 from . import typed
 
 

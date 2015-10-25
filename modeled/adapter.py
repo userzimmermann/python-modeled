@@ -23,15 +23,13 @@ from six import with_metaclass
 
 __all__ = ['Adapter']
 
-from moretools import cached
+from moretools import cached, qualname
 
-from modeled import ismodeledclass, ismodeledobject
-from .base import base
+from modeled.base import base, metabase
+from modeled.object import ismodeledclass, ismodeledobject
 
 
-class Type(base.type):
-    __module__ = 'modeled'
-
+class meta(metabase):
     @cached
     def __getitem__(cls, mclass):
         if not ismodeledclass(mclass):
@@ -43,6 +41,8 @@ class Type(base.type):
         Type.__name__ = '%s[%s].type' % (cls.__name__, mclass.__name__)
 
         class Adapter(with_metaclass(Type, cls, mclass)):
+            __module__ = cls.__module__
+
             # Reset __new__ from base Adapter.__new__
             # (adapting modeled instances)
             # to <adapted modeled class>.__new__ (instantiating class)
@@ -56,14 +56,12 @@ class Type(base.type):
                 cls.__init__(self)
 
         Adapter.mclass = mclass
-        Adapter.__module__ = cls.__module__
         Adapter.__name__ = '%s[%s]' % (cls.__name__, mclass.__name__)
+        Adapter.__qualname__ = '%s[%s]' % (qualname(cls), qualname(mclass))
         return Adapter
 
-Type.__name__ = 'Adapter.type'
 
-
-class Adapter(with_metaclass(Type, base)):
+class Adapter(with_metaclass(meta, base)):
     __module__ = 'modeled'
 
     def __new__(cls, minstance, *args):

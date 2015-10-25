@@ -23,7 +23,7 @@ from six import with_metaclass
 
 from moretools import cached
 
-from modeled import mlist
+from modeled.list import list as mlist
 from . import member
 
 
