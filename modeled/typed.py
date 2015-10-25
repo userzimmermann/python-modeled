@@ -23,7 +23,7 @@ from six import with_metaclass
 
 __all__ = ['base']
 
-from inspect import isclass
+from inspect import getargspec, isclass
 
 from decorator import decorator
 from moretools import cached, qualname
@@ -84,9 +84,22 @@ class base(with_metaclass(Type, base)):
              qualname(type(value))))
 
 
-def typed(func):
-    from inspect import getfullargspec
-    spec = getfullargspec(func)
+def typed(func=None, argtypes=None, returntype=None):
+    if func is None:
+        def typed(func):
+            global typed
+            return typed(func, argtypes, returntype)
+
+        return typed
+
+    if argtypes is not None or returntype is not None:
+        spec = getargspec(func)
+        mtypes = {} if argtypes is None else dict(argtypes)
+        mtypes['return'] = returntype
+    else:
+        from inspect import getfullargspec
+        spec = getfullargspec(func)
+        mtypes = spec.annotations
 
     def typed(func, *args, **kwargs):
         iargs = iter(args)
@@ -103,5 +116,5 @@ def typed(func):
         return result
 
     wrapper = decorator(typed, func)
-    wrapper.mtypes = spec.annotations
+    wrapper.mtypes = mtypes
     return wrapper
