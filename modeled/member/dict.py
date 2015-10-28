@@ -21,28 +21,52 @@
 """
 from six import with_metaclass
 
-from moretools import cached
+from moretools import cached, decamelize
 
-from modeled.dict import dict as mdict
+import modeled
 from . import member
 
 
-class Type(member.type):
+class meta(member.meta):
     @cached
     def __getitem__(cls, mtypes):
-        return member.type.__getitem__(cls, mdict[mtypes])
+        return member.type.__getitem__(cls, modeled.dict[mtypes])
 
-Type.__name__ = 'member.dict.type'
+    @property
+    def itemtype(cls):
+        return cls.mtype.mtype
+
+    @property
+    def keytype(cls):
+        return cls.mtype.mtype.mtypes[0]
+
+    @property
+    def valuetype(cls):
+        return cls.mtype.mtype.mtypes[1]
+
+meta.__name__ = 'member.dict.meta'
 
 
-class Dict(with_metaclass(Type, member)):
+class Dict(with_metaclass(meta, member)):
     __module__ = 'modeled'
+
+    @property
+    def itemtype(self):
+        return self.mtype.mtype
+
+    @property
+    def keytype(self):
+        return self.mtype.mtype.mtypes[0]
+
+    @property
+    def valuetype(self):
+        return self.mtype.mtype.mtypes[1]
 
     def __init__(self, items=None, **options):
         try:
-            assert(issubclass(self.mtype, mdict))
+            assert(issubclass(self.mtype, modeled.dict))
         except AttributeError:
-            items = mdict(items)
+            items = modeled.dict(items)
             self.__class__ = type(self)[items.mtype.mtypes]
             member.__init__(self, items, **options)
         else:
@@ -50,5 +74,13 @@ class Dict(with_metaclass(Type, member)):
                 member.__init__(self, **options)
             else:
                 member.__init__(self, items, **options)
+        self.keyname = options.get('keyname', 'key')
+        try:
+            self.valuename = options['valuename']
+        except KeyError:
+            if modeled.ismodeledclass(self.valuetype):
+                self.valuename = decamelize(self.valuetype.__name__)
+            else:
+                self.valuename = 'value'
 
 Dict.__name__ = 'member.dict'
