@@ -5,16 +5,16 @@ python:
   - '2.7'
   - '3.3'
   - '3.4'
-  - pypy
 
 install:
   - pip install -r requirements.txt --upgrade
   - pip install zetup[commands] --upgrade
   - pip install pytest --upgrade
   - pip install tox --upgrade
-  - zetup install
+  - pip install -e .
 
 script:
   - zetup pytest
   - py.test -v test
   - zetup tox
+  - tox -r -v
