@@ -47,17 +47,14 @@ class List(with_metaclass(meta, member)):
         return self.mtype.mtype
 
     def __init__(self, items=None, **options):
+        if items is None:
+            items = []
         try:
             assert(issubclass(self.mtype, modeled.list))
         except AttributeError:
             items = modeled.list(items)
             self.__class__ = type(self)[items.mtype]
-            member.__init__(self, items, **options)
-        else:
-            if items is None:
-                member.__init__(self, **options)
-            else:
-                member.__init__(self, items, **options)
+        member.__init__(self, items, **options)
         self.indexname = options.get('indexname', 'index')
         try:
             self.itemname = options['itemname']
