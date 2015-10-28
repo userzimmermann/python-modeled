@@ -21,28 +21,36 @@
 """
 from six import with_metaclass
 
-from moretools import cached
+from moretools import cached, decamelize
 
-from modeled.list import list as mlist
+import modeled
 from . import member
 
 
-class Type(member.type):
+class meta(member.type):
     @cached
     def __getitem__(cls, mtype):
-        return member.type.__getitem__(cls, mlist[mtype])
+        return member.type.__getitem__(cls, modeled.list[mtype])
 
-Type.__name__ = 'member.list.type'
+    @property
+    def itemtype(cls):
+        return cls.mtype.mtype
+
+meta.__name__ = 'member.list.meta'
 
 
-class List(with_metaclass(Type, member)):
+class List(with_metaclass(meta, member)):
     __module__ = 'modeled'
+
+    @property
+    def itemtype(self):
+        return self.mtype.mtype
 
     def __init__(self, items=None, **options):
         try:
-            assert(issubclass(self.mtype, mlist))
+            assert(issubclass(self.mtype, modeled.list))
         except AttributeError:
-            items = mlist(items)
+            items = modeled.list(items)
             self.__class__ = type(self)[items.mtype]
             member.__init__(self, items, **options)
         else:
@@ -50,5 +58,13 @@ class List(with_metaclass(Type, member)):
                 member.__init__(self, **options)
             else:
                 member.__init__(self, items, **options)
+        self.indexname = options.get('indexname', 'index')
+        try:
+            self.itemname = options['itemname']
+        except KeyError:
+            if modeled.ismodeledclass(self.itemtype):
+                self.itemname = decamelize(self.itemtype.__name__)
+            else:
+                self.itemname = 'item'
 
 List.__name__ = 'member.list'
