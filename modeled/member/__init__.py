@@ -232,13 +232,13 @@ class member(with_metaclass(Type, typed.base)):
         return repr_ + '(%s)' % repr(default)
 
     def istuple(self):
-        return issubclass(self.mtype, mtuple)
+        return issubclass(self.mtype, modeled.tuple)
 
     def islist(self):
-        return issubclass(self.mtype, mlist)
+        return issubclass(self.mtype, modeled.list)
 
     def isdict(self):
-        return issubclass(self.mtype, mdict)
+        return issubclass(self.mtype, modeled.dict)
 
 
 class InstanceMembersDictBase(simpledict.base):
@@ -328,11 +328,11 @@ def getmodeledmembers(obj, properties=True):
       " of modeled.object")
 
 
-from .tuple import mtuple, Tuple
+from .tuple import Tuple
 member.tuple = Tuple
 
-from .list import mlist, List
+from .list import List
 member.list = List
 
-from .dict import mdict, Dict
+from .dict import Dict
 member.dict = Dict
