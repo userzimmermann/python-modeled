@@ -19,18 +19,33 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-__all__ = ['list', 'ismodeledlistclass', 'ismodeledlist']
-
+from six import with_metaclass
 from six.moves import builtins
 
 from . import typed
 
+__all__ = ['list', 'ismodeledlistclass', 'ismodeledlist']
 
-class list(typed.base, builtins.list):
+
+class meta(typed.base.type):
     __module__ = 'modeled'
 
-    def __init__(self, iterable):
-        items = iter(iterable)
+    @property
+    def itemtype(cls):
+        return cls.mtype
+
+meta.__name__ = 'list.meta'
+
+
+class list(with_metaclass(meta, typed.base, builtins.list)):
+    __module__ = 'modeled'
+
+    @property
+    def itemtype(self):
+        return self.mtype
+
+    def __init__(self, iterable=None):
+        items = iter(iterable if iterable is not None else ())
         try:
             self.mtype
         except AttributeError:
