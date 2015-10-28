@@ -27,7 +27,7 @@ from six.moves import builtins
 
 from moretools import cached
 
-from modeled.tuple import tuple as mtuple
+import modeled
 from . import typed
 
 
@@ -35,8 +35,22 @@ class Type(typed.base.type):
     __module__ = 'modeled'
 
     @cached
-    def __getitem__(cls, mtypes):
-        return typed.base.type.__getitem__(cls, mtuple[mtypes])
+    def __getitem__(cls, types):
+        keytype, valuetype = types
+        return typed.base.type.__getitem__(
+            cls, modeled.tuple[keytype, valuetype])
+
+    @property
+    def itemtype(cls):
+        return cls.mtype
+
+    @property
+    def keytype(cls):
+        return cls.mtype.mtypes[0]
+
+    @property
+    def valuetype(cls):
+        return cls.mtype.mtypes[1]
 
 Type.__name__ = 'dict.type'
 
@@ -45,11 +59,15 @@ class dict(with_metaclass(Type, typed.base, builtins.dict)):
     __module__ = 'modeled'
 
     @property
-    def mkeytype(self):
+    def itemtype(self):
+        return self.mtype
+
+    @property
+    def keytype(self):
         return self.mtype.mtypes[0]
 
     @property
-    def mvaluetype(self):
+    def valuetype(self):
         return self.mtype.mtypes[1]
 
     def __init__(self, iterable=()):
@@ -66,19 +84,19 @@ class dict(with_metaclass(Type, typed.base, builtins.dict)):
         self.update(items)
 
     def __setitem__(self, key, value):
-        if not isinstance(key, self.mkeytype):
-            key = self.mkeytype(key)
-        if not isinstance(value, self.mvaluetype):
-            value = self.mvaluetype(value)
+        if not isinstance(key, self.keytype):
+            key = self.keytype(key)
+        if not isinstance(value, self.valuetype):
+            value = self.valuetype(value)
         builtins.dict.__setitem__(self, key, value)
 
     def update(self, iterable):
         def items():
             for key, value in iterable:
-                if isinstance(key, self.mkeytype):
-                    key = self.mkeytype(key)
-                if isinstance(value, self.mvaluetype):
-                    value = self.mvaluetype(value)
+                if isinstance(key, self.keytype):
+                    key = self.keytype(key)
+                if isinstance(value, self.valuetype):
+                    value = self.valuetype(value)
                 yield (key, value)
 
         builtins.dict.update(self, items())
