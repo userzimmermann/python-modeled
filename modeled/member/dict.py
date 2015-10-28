@@ -63,17 +63,14 @@ class Dict(with_metaclass(meta, member)):
         return self.mtype.mtype.mtypes[1]
 
     def __init__(self, items=None, **options):
+        if items is None:
+            items = {}
         try:
             assert(issubclass(self.mtype, modeled.dict))
         except AttributeError:
             items = modeled.dict(items)
             self.__class__ = type(self)[items.mtype.mtypes]
-            member.__init__(self, items, **options)
-        else:
-            if items is None:
-                member.__init__(self, **options)
-            else:
-                member.__init__(self, items, **options)
+        member.__init__(self, items, **options)
         self.keyname = options.get('keyname', 'key')
         try:
             self.valuename = options['valuename']
