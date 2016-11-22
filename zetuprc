@@ -4,7 +4,7 @@ description =
     Universal data modeling for Python.
 
 author = Stefan Zimmermann <zimmermann.code@gmail.com>
-url = https://bitbucket.org/userzimmermann/python-modeled
+url = https://github.com/modeled/modeled
 
 license = LGPLv3
 
