@@ -60,23 +60,24 @@ class CFuncArgError(MemberError):
 
 
 DEFAULT_MTYPES = {
-  'i': int,
-  'I': int,
-  'l': int,
-  'L': int,
-  'f': float,
-  'd': float,
-  'P': int,
-  'z': bytes,
-  }
+    'i': int,
+    'I': int,
+    'l': int,
+    'L': int,
+    'f': float,
+    'd': float,
+    'P': int,
+    'z': bytes,
+}
 
 
-class Type(member.type):
+class meta(member.meta):
     """Metaclass for :class:`modeled.cfunc.arg`.
 
     - Provides modeled.cfunc.arg[<ctype>, <mtype>] initialization syntax.
     """
-    __module__ = 'modeled'
+    __module__ = 'modeled.cfunc'
+    __qualname__ = 'arg.meta'
 
     error = CFuncArgError
 
@@ -104,13 +105,11 @@ class Type(member.type):
 
         return member.type.__getitem__(cls, mtype, typedcls)
 
-Type.__name__ = 'cfunc.arg.type'
 
-
-class arg(with_metaclass(Type, member)):
+class arg(with_metaclass(meta, member)):
     """Typed function arg member of a :class:`modeled.cfunc`.
     """
-    __module__ = 'modeled'
+    __module__ = 'modeled.cfunc'
 
     ## def __init__(self, ctype, type_or_value, **options):
     ##     self.ctype = ctype
@@ -119,8 +118,6 @@ class arg(with_metaclass(Type, member)):
     def __repr__(self):
         return 'modeled.cfunc.arg[%s, %s]' % (
           self.ctype.__name__, self.mtype.__name__)
-
-arg.__name__ = 'cfunc.arg'
 
 
 def ismodeledcfuncarg(obj):

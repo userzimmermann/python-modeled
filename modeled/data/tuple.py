@@ -15,42 +15,41 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
 
-"""modeled.member.tuple
+"""modeled.data.tuple
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
 
 from moretools import cached
 
-from modeled.tuple import tuple as mtuple
-from . import member
+import modeled
+
+from . import data
 
 
-class Type(member.type):
-    __module__ = 'modeled'
+class meta(data.meta):
+    """
+    Metaclass for :class:`modeled.data`.
+    """
+    __qualname__ = 'data.tuple.meta'
 
     @cached
-    def __getitem__(cls, mtypes):
-        return member.type.__getitem__(cls, mtuple[mtypes])
-
-Type.__name__ = 'member.tuple.type'
+    def __getitem__(cls, types):
+        return super(meta, cls).__getitem__(modeled.tuple[types])
 
 
-class Tuple(with_metaclass(Type, member)):
-    __module__ = 'modeled'
+class tuple(data, metaclass=meta):
+    __qualname__ = 'data.tuple'
 
     def __init__(self, items=None, **options):
         try:
-            assert(issubclass(self.mtype, mtuple))
+            assert(issubclass(self.type, modeled.tuple))
         except AttributeError:
-            items = mtuple(items)
+            items = modeled.tuple(items)
             self.__class__ = type(self)[items.mtypes]
-            member.__init__(self, items, **options)
+            data.__init__(self, items, **options)
         else:
             if items is None:
-                member.__init__(self, **options)
+                data.__init__(self, **options)
             else:
-                member.__init__(self, items, **options)
-
-Tuple.__name__ = 'member.tuple'
+                data.__init__(self, items, **options)

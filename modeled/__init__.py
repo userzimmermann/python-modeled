@@ -1,6 +1,6 @@
 # python-modeled
 #
-# Copyright (C) 2014-2015 Stefan Zimmermann <zimmermann.code@gmail.com>
+# Copyright (C) 2014-2016 Stefan Zimmermann <zimmermann.code@gmail.com>
 #
 # python-modeled is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -19,7 +19,24 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-__import__('zetup').annotate(__name__)
+__import__('zetup').toplevel(__name__, [
+    'base',
+    'tuple', 'list', 'dict',
+    'range', 'datetime', 'namedtuple', 'simpledict',
+    'options', 'Options'
+    'meta', 'metamethod', 'metaclassmethod',
+    'ismetamethod', 'ismetaclassmethod', # 'ismodeledmetaclass',
+    'object', 'ismodeledclass', 'ismodeledobject',
+    'MembersDict', 'MemberError', 'member',
+    'InstanceMembersDict', 'instancemember',
+    # 'ismodeledmemberclass', 'ismodeledmember', 'ismodeledinstancemember',
+    # 'getmodeledmembers',
+    'PropertyError', 'PropertiesDict', 'property',
+    # 'ismodeledproperty', 'getmodeledproperties',
+    'cfunc', # 'ismodeledcfuncclass', 'ismodeledcfuncresult',
+    'CFuncArgError', # 'ismodeledcfuncarg', 'getmodeledcfuncargs',
+    'Adapter', 'AdapterMeta',
+], __call__=lambda obj: deco(obj))
 
 import sys
 from path import Path
@@ -29,6 +46,8 @@ for path in (Path(p) / 'modeled' for p in sys.path):
         __path__.append(path.realpath())
 del sys, path, Path
 
+
+from .base import base
 
 from .tuple import tuple, ismodeledtupleclass, ismodeledtuple
 mtuple = tuple
@@ -79,7 +98,10 @@ from .property import (
 )
 mproperty = property
 
+from .strict import strict
 from .typed import typed
+
+from .data import data
 
 from .cfunc import (
     cfunc, ismodeledcfuncclass, ismodeledcfuncresult,
@@ -89,3 +111,17 @@ mcfunc = cfunc
 mcarg = cfunc.arg
 
 from .adapter import Adapter, meta as AdapterMeta
+
+
+from inspect import isclass, isfunction, getmembers
+
+
+def deco(obj):
+    """The logic behind the ``@modeled`` decorator.
+    """
+    if isclass(obj):
+        return object[meta(
+            obj.__name__, obj.__bases__, dict(getmembers(obj)))]
+
+    if isfunction(obj):
+        return typed(obj)

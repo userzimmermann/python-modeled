@@ -19,22 +19,21 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
+__all__ = ['list', 'ismodeledlistclass', 'ismodeledlist']
+
 from six import with_metaclass
 from six.moves import builtins
 
 from . import typed
 
-__all__ = ['list', 'ismodeledlistclass', 'ismodeledlist']
 
-
-class meta(typed.base.type):
+class meta(typed.base.meta):
     __module__ = 'modeled'
+    __qualname__ = 'list.meta'
 
     @property
     def itemtype(cls):
         return cls.mtype
-
-meta.__name__ = 'list.meta'
 
 
 class list(with_metaclass(meta, typed.base, builtins.list)):

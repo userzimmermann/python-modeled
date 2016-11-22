@@ -19,12 +19,11 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
-
 __all__ = [
   'PropertyError', 'PropertiesDict', 'property',
   'ismodeledproperty', 'getmodeledproperties']
 
+from six import with_metaclass
 from six.moves import builtins
 
 from moretools import cached, simpledict
@@ -57,7 +56,7 @@ class PropertyError(MemberError):
     __module__ = 'modeled'
 
 
-class Type(member.type):
+class Type(member.meta):
     __module__ = 'modeled'
 
     error = PropertyError

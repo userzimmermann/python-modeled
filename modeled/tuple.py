@@ -19,10 +19,9 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
-
 __all__ = ['tuple', 'ismodeledtupleclass', 'ismodeledtuple']
 
+from six import with_metaclass
 from six.moves import builtins
 
 from moretools import cached
@@ -30,25 +29,25 @@ from moretools import cached
 from . import typed
 
 
-class Type(typed.base.type):
-    __module__ = 'modeled'
+class meta(typed.base.meta):
+    __qualname__ = 'tuple.meta'
 
     @cached
-    def __getitem__(cls, mtypes, typedcls=None):
+    def __getitem__(cls, types, typedcls=None):
         if not typedcls:
             class typedcls(cls):
                 pass
 
-        typedcls.mtypes = mtypes = builtins.tuple(mtypes)
+        typedcls.mtypes = typedcls.types = types = builtins.tuple(types)
         typedcls.__module__ = cls.__module__
         typedcls.__name__ = '%s[%s]' % (
-          cls.__name__, ', '.join(t.__name__ for t in typedcls.mtypes))
+            cls.__name__, ', '.join(t.__name__ for t in types))
+        typedcls.__qualname__ = '%s[%s]' % (
+            cls.__qualname__, ', '.join(t.__name__ for t in types))
         return typedcls
 
-Type.__name__ = 'tuple.type'
 
-
-class tuple(with_metaclass(Type, typed.base, builtins.tuple)):
+class tuple(with_metaclass(meta, typed.base, builtins.tuple)):
     __module__ = 'modeled'
 
     def __new__(cls, iterable):

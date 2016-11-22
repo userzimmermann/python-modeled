@@ -19,22 +19,25 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
-
 __all__ = ['range']
 
+from six import with_metaclass
 from operator import lt, le
 
 from moretools import cached
 
-from modeled.tuple import tuple as mtuple
+import modeled
+
 from . import typed
 
 
-class Type(typed.base.type):
+class meta(typed.base.meta):
+    __module__ = 'modeled'
+    __qualname__ = 'range.meta'
+
     INC_FUNCTIONS = {
-      str: lambda value, step: chr(ord(value) + step),
-      }
+        str: lambda value, step: chr(ord(value) + step),
+    }
 
     @cached
     def __getitem__(cls, mtype):
@@ -42,7 +45,7 @@ class Type(typed.base.type):
             pass
 
         if type(mtype) is tuple:
-            mtype = mtuple[mtype]
+            mtype = modeled.tuple[mtype]
             incfuncs = tuple(
                 cls.INC_FUNCTIONS.get(mt, mt.__add__)
                 for mt in mtype.mtypes)
@@ -59,7 +62,7 @@ class Type(typed.base.type):
     inc = inclusive
 
 
-class range(with_metaclass(Type, typed.base)):
+class range(with_metaclass(meta, typed.base)):
     __module__ = 'modeled'
 
     def __init__(self, start, stop, step=1, inclusive=False):
@@ -97,8 +100,9 @@ class range(with_metaclass(Type, typed.base)):
 
     def __array__(self, dtype=None):
         import numpy
+
         # extra iter() because list() tries .__len__(),
-        #  which also creates list
+        # which also creates a list as intermediate step
         return numpy.array(list(iter(self)), dtype=dtype)
 
     def __repr__(self):

@@ -101,7 +101,7 @@ class meta(base):
 
         options = clsattrs.get('model') # The user-defined model options
         model = cls.meta.model # The modeled class' model metaclass
-        cls.model = model(mclass=cls, members=members(), options=options)
+        cls.model = model(owner=cls, members=members(), options=options)
 
     @cached
     def __getitem__(cls, bases):

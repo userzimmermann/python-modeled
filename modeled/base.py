@@ -39,13 +39,13 @@ class metabase(zetup.meta):
         """
         return type(cls)
 
-    @property
-    def type(cls):
-        """Get the metaclass (type) of `cls`.
-        """
-        warn("'%s.type' property is deprecated. Use '%s.meta' instead."
-             % (cls, cls), DeprecationWarning)
-        return cls.meta
+    # @property
+    # def type(cls):
+    #     """Get the metaclass (type) of `cls`.
+    #     """
+    #     warn("'%s.type' property is deprecated. Use '%s.meta' instead."
+    #          % (cls, cls), DeprecationWarning)
+    #     return cls.meta
 
     @classmethod
     def metamro(mcs):

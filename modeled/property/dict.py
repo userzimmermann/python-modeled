@@ -31,7 +31,7 @@ from modeled.member import member
 from . import property
 
 
-class Type(property.type):
+class meta(property.meta):
     @cached
     def __getitem__(cls, mtypes):
         mkeytype, mvaluetype = mtypes
@@ -131,7 +131,10 @@ class DictProxy(object):
         return iter(self.keys())
 
 
-class Dict(with_metaclass(Type, property)):
+class Dict(with_metaclass(meta, property)):
+    __module__ = 'modeled'
+    __qualname__ = 'property.dict'
+
     @builtins.property
     def mkeytype(self):
         return self.mtype.mtypes[0]
@@ -164,7 +167,7 @@ class Dict(with_metaclass(Type, property)):
         return self
 
     def __get__(self, obj, owner=None):
-        if obj is None: # ==> Accessed from modeled.object class level
+        if obj is None:  # ==> Accessed from modeled.object class level
             return self
 
         return DictProxy(self, obj)
@@ -185,5 +188,3 @@ class Dict(with_metaclass(Type, property)):
             DictProxy(self, minstance)[key] = value
 
         return item
-
-Dict.__name__ = Dict.__qualname__ = 'property.dict'

@@ -26,18 +26,20 @@ from modeled.object import object as mobject
 from .arg import ArgsDict, ismodeledcfuncarg
 
 
-class Model(mobject.model.type):
+class Model(mobject.model.meta):
     """Metaclass for :class:`modeled.cfunc.model`.
 
     - Checks user-defined `class model` for `restype` and `cfunc` options.
     """
-    __module__ = 'modeled'
+    __module__ = 'modeled.cfunc'
+    __qualname__ = 'cfunc.model.meta'
 
-    def __init__(cls, mclass, members=None, options=None):
+    def __init__(cls, owner, members=None, options=None):
         options = Model.options(options)
-        mobject.model.type.__init__(cls, mclass, members, options)
+        super(Model, cls).__init__(owner, members, options)
         cls.args = ArgsDict.struct(model=cls, args=(
-          (name, a) for name, a in cls.members if ismodeledcfuncarg(a)))
+            (name, arg) for name, arg in cls.members
+            if ismodeledcfuncarg(arg)))
         if options: # No restype or cfunc option ==> undefined
             # (Will be inherited from base model class
             #  or cause AttributeError on access)
@@ -49,5 +51,3 @@ class Model(mobject.model.type):
                 cls.cfunc = options['cfunc']
             except KeyError:
                 pass
-
-Model.__name__ = 'cfunc.model.type'

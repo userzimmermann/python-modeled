@@ -28,24 +28,26 @@ import collections
 
 from moretools import cached
 
-from modeled.tuple import tuple as mtuple
+import modeled
+
 from . import typed
 
 
-class Type(mtuple.type):
+class meta(modeled.tuple.meta):
     __module__ = 'modeled'
+    __qualname__ = 'namedtuple.meta'
 
     @cached
     def __getitem__(cls, mtypes, typedcls=None):
         mtypes = tuple(mtypes)
         assert(len(mtypes) == len(cls._fields))
-        return mtuple.type.__getitem__(cls, mtypes, typedcls)
+        return modeled.tuple.type.__getitem__(cls, mtypes, typedcls)
 
 
 def namedtuple(typename, names):
     basetuple = collections.namedtuple(typename, names)
 
-    class namedtuple(with_metaclass(Type, typed.base, basetuple)):
+    class namedtuple(with_metaclass(meta, typed.base, basetuple)):
         def __new__(cls, iterable=(), **fields):
             if fields:
                 items = tuple(item[1] for item in sorted(
@@ -67,9 +69,9 @@ def namedtuple(typename, names):
               mtype(item) for mtype, item in zip(cls.mtypes, items))
             return basetuple.__new__(cls, items)
 
-    try: # Taken from collections.py:
+    try:  # Taken from collections.py
         namedtuple.__module__ = sys._getframe(1).f_globals.get(
-          '__name__', '__main__')
+            '__name__', '__main__')
     except (AttributeError, ValueError):
         pass
 

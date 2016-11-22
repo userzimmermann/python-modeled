@@ -31,14 +31,17 @@ import modeled
 from . import typed
 
 
-class Type(typed.base.type):
-    __module__ = 'modeled'
+class meta(typed.base.meta):
+    """
+    Metaclass for :class:`modeled.dict`.
+    """
+    __qualname__ = 'dict.meta'
 
     @cached
     def __getitem__(cls, types):
         keytype, valuetype = types
-        return typed.base.type.__getitem__(
-            cls, modeled.tuple[keytype, valuetype])
+        return super(meta, cls).__getitem__(
+            modeled.tuple[keytype, valuetype])
 
     @property
     def itemtype(cls):
@@ -52,12 +55,14 @@ class Type(typed.base.type):
     def valuetype(cls):
         return cls.mtype.mtypes[1]
 
-Type.__name__ = 'dict.type'
 
+class dict(with_metaclass(meta, typed.base, builtins.dict)):
+    """
+    The MODELED typable dictionary class, assocaiated with a keytype and a
+    valuetype:
 
-class dict(with_metaclass(Type, typed.base, builtins.dict)):
-    __module__ = 'modeled'
-
+    >>> Dict = modeled.dict[str, int]
+    """
     @property
     def itemtype(self):
         return self.mtype

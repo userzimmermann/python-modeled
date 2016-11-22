@@ -1,14 +1,14 @@
 [modeled]
 
 description =
-    Universal data modeling for Python.
+    Universal data modeling for Python
 
 author = Stefan Zimmermann <zimmermann.code@gmail.com>
-url = https://bitbucket.org/userzimmermann/python-modeled
+url = https://github.com/modeled/modeled
 
 license = LGPLv3
 
-python = 2.7 3.3 3.4
+python = 2.7 3.3 3.4 3.5
 
 keep made =
     setup.py
@@ -25,6 +25,6 @@ classifiers =
 
 keywords =
     modeled model modeling modelled modelling
-    serialization exchange mapping
+    universal data serialization exchange mapping
     class object member property typed
     ctypes cfunc funcptr

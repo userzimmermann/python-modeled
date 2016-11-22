@@ -34,14 +34,11 @@ def test_metabase():
 def test_base():
     """Test :class:`modeled.base.base`.
     """
-    # should not be available in modeled top-level
-    assert base not in (obj for (_, obj) in getmembers(modeled))
+    # # should not be available in modeled top-level
+    # assert base not in (obj for (_, obj) in getmembers(modeled))
 
     # check metaclass and .meta property
     assert base.meta is type(base) is metabase
-    # and deprecation of .type property
-    with pytest.warns(DeprecationWarning):
-        assert base.type is metabase
 
     # check convenience classmethod for getting mro of metaclass
     assert base.metamro() == metabase.mro(metabase)

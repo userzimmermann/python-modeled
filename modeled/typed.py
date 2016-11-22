@@ -19,61 +19,119 @@
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
-
 __all__ = ['base']
 
+import six
+from six import with_metaclass
 from inspect import getargspec, isclass
 
 from decorator import decorator
 from moretools import cached, qualname
 
-from .base import base
+import modeled
 
 
-class Type(base.type):
-    """Base metaclass for :mod:`modeled` components
-       with a connected data type (mtype).
-
-    - Provides class[<mtype>] syntax.
+class meta(modeled.base.meta):
     """
+    Base metaclass for MODELED components with a connected data type (mtype).
+
+    * Provides ``class[mtype]`` syntax:
+
+    >>> class typable(base):
+    ...     pass
+
+    >>> type(typable) is meta
+    True
+
+    >>> typable[int].mtype is int
+    True
+    """
+    __qualname__ = 'meta'  # for PY2
+
     @property
     @cached
     def strict(cls):
-        """Create a derived base class with strict type checking
-           (no type conversions, just raise TypeError).
         """
-        class strict(cls):
-            __module__ = 'modeled'
+        Creates a derived base class with strict data type checking,
+        which means:
 
-            strict = True
+        * No type conversions shall be performed on data processing.
+        * Unmatching data types shall immediately raise ``TypeError``.
 
-        strict.__name__ = cls.__name__ + '.strict'
+        >>> class typable(base):
+        ...     pass
+
+        >>> typable.isstrict()
+        False
+
+        >>> issubclass(typable.strict, typable)
+        True
+
+        >>> typable.strict.isstrict()
+        True
+
+        Resulting class objects are cached:
+
+        >>> typable.strict is typable.strict
+        True
+        """
+        class strict(cls, modeled.strict.base):
+            __module__ = cls.__module__
+            __qualname__ = qualname(cls) + '.strict'
+
+            @classmethod
+            def isstrict(cls):
+                """
+                Overwrites basic method and just returns ``True`` to denote
+                strict data type checking.
+                """
+                return True
+
         return strict
 
     @cached
-    def __getitem__(cls, mtype, typedcls=None):
-        """Derive a typed subclass from `cls` with given `mtype`.
-
-        - Optionally takes a predefined `typedcls`
-          from a derived metaclass.__getitem__.
+    def __getitem__(cls, _type, typedcls=None, typedbase=None):
         """
-        if not typedcls:
-            class typedcls(cls):
+        Derive a typed subclass from `cls` with given `mtype`.
+
+        * Optionally takes a predefined `typedcls` from a derived
+          metaclass' ``.__getitem__``.
+        """
+        if not isclass(_type):
+            raise TypeError("MODELED data types must be classes, not: %s"
+                            % repr(_type))
+
+        if typedcls is None:
+            if typedbase is None:
+                typedbase = cls
+
+            class typedcls(typedbase):
                 pass
 
-        typedcls.mtype = mtype
+        typedcls.mtype = typedcls.type = _type
         typedcls.__module__ = cls.__module__
-        typedcls.__name__ = '%s[%s]' % (cls.__name__, mtype.__name__)
+        typedcls.__name__ = '%s[%s]' % (cls.__name__, _type.__name__)
+        typedcls.__qualname__ = '%s[%s]' % (qualname(cls), _type.__name__)
         return typedcls
 
-Type.__name__ = 'base.type'
 
-
-class base(with_metaclass(Type, base)):
-    """Base class for all :mod:`modeled` components
-       with a connected data type (mtype).
+class base(with_metaclass(meta, modeled.base)):
     """
+    Base class for all MODELED components with a connected data type (mtype).
+    """
+    __qualname__ = 'base'  # for PY2
+
+    @classmethod
+    def isstrict(cls):
+        """
+        By default, MODELED typable classes don't do strict type checking,
+        so this method just returns ``False``.
+
+        Only the ``.strict`` variants of typable classes do so.
+        They are derived via :prop:`modeled.typed.meta.strict`.
+        """
+        return False
+
     def new(self, value, func):
         value = func(value)
         if isinstance(value, self.mtype):
@@ -118,3 +176,6 @@ def typed(func=None, argtypes=None, returntype=None):
     wrapper = decorator(typed, func)
     wrapper.mtypes = mtypes
     return wrapper
+
+
+import modeled.strict

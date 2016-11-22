@@ -15,62 +15,91 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
 
-"""modeled.member.dict
+"""modeled.data.dict
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
 
 from moretools import cached, decamelize
 
 import modeled
-from . import member
+
+from . import data
 
 
-class meta(member.meta):
+class meta(data.meta):
+    __qualname__ = 'data.dict.meta'
+
     @cached
-    def __getitem__(cls, mtypes):
-        return member.type.__getitem__(cls, modeled.dict[mtypes])
+    def __getitem__(cls, keytype_and_valuetype):
+        return super(meta, cls).__getitem__(
+            modeled.dict[keytype_and_valuetype])
 
     @property
     def itemtype(cls):
-        return cls.mtype.mtype
+        """
+        >>> modeled.data.dict[str, int].itemtype
+        <class 'modeled.tuple[str, int]'>
+        """
+        return cls.type.type
 
     @property
     def keytype(cls):
-        return cls.mtype.mtype.mtypes[0]
+        """
+        >>> modeled.data.dict[str, int].keytype
+        <class 'str'>
+        """
+        return cls.type.type.mtypes[0]
 
     @property
     def valuetype(cls):
-        return cls.mtype.mtype.mtypes[1]
+        """
+        >>> modeled.data.dict[str, int]().valuetype
+        <class 'int'>
+        """
+        return cls.type.type.mtypes[1]
 
-meta.__name__ = 'member.dict.meta'
 
 
-class Dict(with_metaclass(meta, member)):
-    __module__ = 'modeled'
+class dict(data, metaclass=meta):
+    __qualname__ = 'data.dict'
 
     @property
     def itemtype(self):
-        return self.mtype.mtype
+        """
+        >>> modeled.data.dict[str, int]().itemtype
+        <class 'modeled.tuple[str, int]'>
+        """
+        return self.type.itemtype
 
     @property
     def keytype(self):
-        return self.mtype.mtype.mtypes[0]
+        """
+        >>> modeled.data.dict[str, int]().keytype
+        <class 'str'>
+        """
+        return self.type.keytype
 
     @property
     def valuetype(self):
-        return self.mtype.mtype.mtypes[1]
+        """
+        >>> modeled.data.dict[str, int]().valuetype
+        <class 'int'>
+        """
+        return self.type.valuetype
 
     def __init__(self, items=None, **options):
         if items is None:
             items = {}
         try:
-            assert(issubclass(self.mtype, modeled.dict))
+            assert issubclass(self.type, modeled.dict)
         except AttributeError:
+            # ==> no data type defined
+            # ==> let modeled.dict determine keytype and valuetype
             items = modeled.dict(items)
-            self.__class__ = type(self)[items.mtype.mtypes]
-        member.__init__(self, items, **options)
+            # and derive a typed Dict based on the determined types
+            self.__class__ = type(self)[items.itemtype]
+        data.__init__(self, items, **options)
         self.keyname = options.get('keyname', 'key')
         try:
             self.valuename = options['valuename']
@@ -79,5 +108,3 @@ class Dict(with_metaclass(meta, member)):
                 self.valuename = decamelize(self.valuetype.__name__)
             else:
                 self.valuename = 'value'
-
-Dict.__name__ = 'member.dict'

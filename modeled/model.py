@@ -23,15 +23,18 @@ __all__ = ['Model']
 
 from inspect import getmembers
 
-from moretools import DictStruct
+from moretools import DictStruct, qualname
+
+from .base import metabase
 
 
 class modelbase(object):
-    def __init__(self, minstance):
-        self.minstance = minstance
+    def __init__(self, owner):
+        self.owner = owner
         self.members = InstanceMembersDict(
-          (name, instancemember(m, minstance)) for name, m in self.members)
-        minstance.__dict__.update(self.members)
+            (name, instancemember(origin, owner))
+            for name, origin in self.members)
+        owner.__dict__.update(self.members)
 
 
 # Import modules that need to import modelbase in reverse:
@@ -49,10 +52,11 @@ def _options(options):
     return options
 
 
-class Model(type):
-    """Model info metaclass for creating :class:`modeled.object`.
+class Model(metabase):
+    """
+    Model info metaclass for creating :class:`modeled.object`.
 
-    - Provides access to all :class:`modeled.member` definitions
+    * Provides access to all :class:`modeled.member` definitions
       and custom options.
     """
     __module__ = 'modeled'
@@ -67,9 +71,9 @@ class Model(type):
             return dict(getmembers(options))
         return options
 
-    def __new__(mcs, mclass, members=None, options=None):
+    def __new__(mcs, owner, members=None, options=None):
         def bases():
-            for cls in mclass.__bases__:
+            for cls in owner.__bases__:
                 try:
                     yield cls.model
                 except AttributeError:
@@ -77,53 +81,47 @@ class Model(type):
 
         bases = tuple(bases())
         return type.__new__(
-          mcs, '%s.model' % mclass.__name__, bases or (modelbase,), {
-            '__module__': mclass.__module__,
-            'extensions': DictStruct(
-              '%s.model.extensions' % mclass.__name__,
-              tuple(b.extensions for b in bases)),
+            mcs, '%s.model' % owner.__name__, bases or (modelbase, ), {
+                '__module__': owner.__module__,
+                'extensions': DictStruct(
+                    '%s.model.extensions' % owner.__name__,
+                    tuple(b.extensions for b in bases)),
             })
 
-    def __init__(self, mclass, members=None, options=None):
-        """Create the model info for modeled `mclass`
-           with optional override `members` and `options`.
+    def __init__(self, owner, members=None, options=None):
         """
-        self.mclass = mclass
+        Create the ``.model`` holder for MODELED `owner` class
+        with optional override `members` and `options`.
+        """
+        self.owner = owner
         ## try:
-        ##     options = options or mclass.model
+        ##     options = options or owner.model
         ## except AttributeError: # No options.
         options = _options(options)
         ## options = model.options(options)
         if not options:
-            self.name = mclass.__name__
+            self.name = owner.__name__
             self.options = Options.struct(model=self)
         else:
             ## if not isinstance(options, dict):
             ##     options = dict(getmembers(options))
-            self.name = options.pop('name', mclass.__name__)
+            self.name = options.pop('name', owner.__name__)
             self.options = Options.struct(model=self, options=options)
         if members:
             self.members = MembersDict.struct(model=self, members=(
               (m.name, m) for m in sorted(members, key=lambda m: m._id)))
-            ## self.members = memberstype(mclass,
+            ## self.members = memberstype(owner,
             ##   ((m.name, m) for m in sorted(members, key=lambda m: m._id)))
         else:
             self.members = MembersDict.struct(
-              model=self, members=getmodeledmembers(mclass))
-            ## self.members = memberstype(mclass, getmodeledmembers(mclass))
+              model=self, members=getmodeledmembers(owner))
+            ## self.members = memberstype(owner, getmodeledmembers(owner))
         self.properties = PropertiesDict.struct(model=self, properties=(
           (name, m) for name, m in self.members if ismodeledproperty(m)))
         # self.extensions = []
 
     def __repr__(self):
-        return '%s.model' % self.mclass.__name__
-
-    @property
-    def type(cls):
-        """Get a :class:`model`'s meta class with .type.
-        """
-        return type(cls)
-
-Model.__name__ = 'object.type.model'
+        return '%s.model' % qualname(self.owner)
 
 
+Model.__name__ = 'object.meta.model'

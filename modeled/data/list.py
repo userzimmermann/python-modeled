@@ -15,46 +15,47 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with python-modeled.  If not, see <http://www.gnu.org/licenses/>.
 
-"""modeled.member.list
+"""modeled.data.list
 
 .. moduleauthor:: Stefan Zimmermann <zimmermann.code@gmail.com>
 """
-from six import with_metaclass
 
 from moretools import cached, decamelize
 
 import modeled
-from . import member
+
+from . import data
 
 
-class meta(member.type):
+class meta(data.meta):
+    __qualname__ = 'data.list.meta'
+
     @cached
-    def __getitem__(cls, mtype):
-        return member.type.__getitem__(cls, modeled.list[mtype])
+    def __getitem__(cls, _type):
+        return super(meta, cls).__getitem__(modeled.list[_type])
 
     @property
     def itemtype(cls):
-        return cls.mtype.mtype
-
-meta.__name__ = 'member.list.meta'
+        return cls.type.type
 
 
-class List(with_metaclass(meta, member)):
-    __module__ = 'modeled'
+
+class list(data, metaclass=meta):
+    __qualname__ = 'data.list'
 
     @property
     def itemtype(self):
-        return self.mtype.mtype
+        return self.type.type
 
     def __init__(self, items=None, **options):
         if items is None:
             items = []
         try:
-            assert(issubclass(self.mtype, modeled.list))
+            assert(issubclass(self.type, modeled.list))
         except AttributeError:
             items = modeled.list(items)
-            self.__class__ = type(self)[items.mtype]
-        member.__init__(self, items, **options)
+            self.__class__ = type(self)[items.type]
+        data.__init__(self, items, **options)
         self.indexname = options.get('indexname', 'index')
         try:
             self.itemname = options['itemname']
@@ -63,5 +64,3 @@ class List(with_metaclass(meta, member)):
                 self.itemname = decamelize(self.itemtype.__name__)
             else:
                 self.itemname = 'item'
-
-List.__name__ = 'member.list'
